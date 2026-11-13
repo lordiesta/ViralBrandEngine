@@ -1,0 +1,2948 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ViralBrandEngine — Autonomous AI Video Studio</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-dark: #0a0b10;
+      --card-bg: rgba(18, 20, 32, 0.7);
+      --card-border: rgba(255, 255, 255, 0.08);
+      --primary: #6366f1;
+      --primary-glow: rgba(99, 102, 241, 0.35);
+      --accent: #ec4899;
+      --accent-glow: rgba(236, 72, 153, 0.35);
+      --cyan: #06b6d4;
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --success: #10b981;
+      --warning: #f59e0b;
+      --radius: 16px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--bg-dark);
+      background-image: 
+        radial-gradient(at 0% 0%, rgba(99, 102, 241, 0.15) 0px, transparent 50%),
+        radial-gradient(at 100% 100%, rgba(236, 72, 153, 0.12) 0px, transparent 50%),
+        radial-gradient(at 50% 50%, rgba(6, 182, 212, 0.06) 0px, transparent 50%);
+      color: var(--text-main);
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background-image: linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+                        linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+      background-size: 40px 40px;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 24px 20px;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* Header */
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 28px;
+      padding-bottom: 18px;
+      border-bottom: 1px solid var(--card-border);
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .logo-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, var(--primary), var(--accent));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 0 24px var(--primary-glow);
+    }
+
+    .brand-text h1 {
+      font-size: 1.5rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      background: linear-gradient(to right, #fff, #cbd5e1);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .brand-text p {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      font-weight: 500;
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .api-badge {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 12px;
+      border-radius: 8px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      color: var(--text-muted);
+    }
+
+    .api-badge.active {
+      background: rgba(16, 185, 129, 0.15);
+      border-color: rgba(16, 185, 129, 0.3);
+      color: #34d399;
+    }
+
+    .btn-settings {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 16px;
+      background: rgba(99, 102, 241, 0.15);
+      border: 1px solid rgba(99, 102, 241, 0.35);
+      border-radius: 10px;
+      color: #c7d2fe;
+      font-size: 0.82rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .btn-settings:hover {
+      background: rgba(99, 102, 241, 0.28);
+      color: #fff;
+      transform: translateY(-1px);
+    }
+
+    /* Main Grid */
+    .dashboard-grid {
+      display: grid;
+      grid-template-columns: 460px 1fr;
+      gap: 28px;
+    }
+
+    @media (max-width: 1080px) {
+      .dashboard-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* Cards */
+    .glass-card {
+      background: var(--card-bg);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid var(--card-border);
+      border-radius: var(--radius);
+      padding: 26px;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+    }
+
+    .card-title {
+      font-size: 1.15rem;
+      font-weight: 700;
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .card-subtitle {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      margin-bottom: 20px;
+    }
+
+    /* Form Elements */
+    .form-group {
+      margin-bottom: 18px;
+    }
+
+    label {
+      display: block;
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: #cbd5e1;
+      margin-bottom: 8px;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    textarea, input, select {
+      width: 100%;
+      background: rgba(10, 11, 16, 0.75);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 10px;
+      padding: 12px 14px;
+      color: #fff;
+      font-family: inherit;
+      font-size: 0.95rem;
+      transition: all 0.2s ease;
+      outline: none;
+    }
+
+    textarea:focus, input:focus, select:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px var(--primary-glow);
+    }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+    }
+
+    .preset-container {
+      margin-bottom: 18px;
+    }
+
+    .chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .chip {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 8px;
+      padding: 6px 12px;
+      font-size: 0.78rem;
+      color: #cbd5e1;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .chip:hover {
+      background: rgba(99, 102, 241, 0.2);
+      border-color: var(--primary);
+      color: #fff;
+    }
+
+    .btn-generate {
+      width: 100%;
+      padding: 16px;
+      border: none;
+      border-radius: 12px;
+      background: linear-gradient(135deg, var(--primary), var(--accent));
+      color: #fff;
+      font-size: 1rem;
+      font-weight: 700;
+      cursor: pointer;
+      box-shadow: 0 10px 25px var(--primary-glow);
+      transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      margin-top: 10px;
+    }
+
+    .btn-generate:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 14px 30px rgba(236, 72, 153, 0.4);
+    }
+
+    .btn-generate:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none;
+    }
+    .auth-spinner {
+      width: 18px;
+      height: 18px;
+      border: 2px solid rgba(255, 255, 255, 0.35);
+      border-top-color: #fff;
+      border-radius: 50%;
+      display: inline-block;
+      animation: auth-spin 0.75s linear infinite;
+    }
+    @keyframes auth-spin {
+      to { transform: rotate(360deg); }
+    }
+
+    /* Active Pipeline Status Monitor */
+    .pipeline-status-card {
+      margin-top: 22px;
+      padding: 18px;
+      border-radius: 12px;
+      background: rgba(10, 11, 16, 0.9);
+      border: 1px solid rgba(99, 102, 241, 0.3);
+      display: none;
+    }
+
+    .pipeline-steps {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-top: 14px;
+    }
+
+    .step-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+    }
+
+    .step-item.active {
+      color: #38bdf8;
+      font-weight: 600;
+    }
+
+    .step-item.done {
+      color: #34d399;
+    }
+
+    .step-icon {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.75rem;
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .step-item.active .step-icon {
+      background: rgba(56, 189, 248, 0.2);
+      border-color: #38bdf8;
+      animation: spin 2s linear infinite;
+    }
+
+    .step-item.done .step-icon {
+      background: rgba(16, 185, 129, 0.2);
+      border-color: #10b981;
+    }
+
+    @keyframes spin {
+      100% { transform: rotate(360deg); }
+    }
+
+    /* Gallery Section */
+    .gallery-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+
+    .refresh-btn {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      color: #cbd5e1;
+      padding: 8px 14px;
+      border-radius: 8px;
+      font-size: 0.8rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s;
+    }
+
+    .refresh-btn:hover {
+      background: rgba(255, 255, 255, 0.1);
+      color: #fff;
+    }
+    .gallery-actions { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+    .delete-btn {
+      background: rgba(239, 68, 68, 0.12);
+      border: 1px solid rgba(239, 68, 68, 0.35);
+      color: #fca5a5;
+      padding: 8px 14px;
+      border-radius: 8px;
+      font-size: 0.8rem;
+      cursor: pointer;
+    }
+    .delete-btn:disabled { opacity: 0.45; cursor: not-allowed; }
+    .select-video {
+      position: absolute;
+      top: 12px;
+      left: 12px;
+      z-index: 4;
+      width: 22px;
+      height: 22px;
+      accent-color: #ec4899;
+      cursor: pointer;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.6);
+    }
+    .video-card.selected {
+      border-color: #ec4899;
+      box-shadow: 0 0 0 2px rgba(236, 72, 153, 0.25);
+    }
+
+    .video-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+      gap: 20px;
+    }
+
+    .video-card {
+      background: rgba(10, 11, 16, 0.85);
+      border: 1px solid var(--card-border);
+      border-radius: 14px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .video-card:hover {
+      transform: translateY(-4px);
+      border-color: rgba(99, 102, 241, 0.4);
+      box-shadow: 0 12px 28px rgba(0, 0, 0, 0.5);
+    }
+
+    .video-player-wrapper {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 9 / 16;
+      background: #000;
+      overflow: hidden;
+    }
+
+    .video-player-wrapper video {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .video-details {
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      flex-grow: 1;
+    }
+
+    .video-topic {
+      font-weight: 700;
+      font-size: 0.92rem;
+      line-height: 1.35;
+      color: #f1f5f9;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    .video-meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      margin-top: auto;
+      padding-top: 8px;
+      border-top: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .badge-status {
+      display: inline-block;
+      padding: 3px 8px;
+      border-radius: 6px;
+      font-size: 0.7rem;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+
+    .badge-COMPLETED {
+      background: rgba(16, 185, 129, 0.2);
+      color: #34d399;
+      border: 1px solid rgba(16, 185, 129, 0.3);
+    }
+
+    .badge-EDITING_VIDEO, .badge-FETCHING_BROLL, .badge-SYNTHESIZING_AUDIO, .badge-GENERATING_SCRIPT {
+      background: rgba(6, 182, 212, 0.2);
+      color: #38bdf8;
+      border: 1px solid rgba(6, 182, 212, 0.3);
+    }
+
+    .badge-FAILED {
+      background: rgba(239, 68, 68, 0.2);
+      color: #f87171;
+      border: 1px solid rgba(239, 68, 68, 0.3);
+    }
+
+    .pipeline-error {
+      margin-top: 16px;
+      padding: 12px 14px;
+      border: 1px solid rgba(239, 68, 68, 0.35);
+      border-radius: 10px;
+      background: rgba(127, 29, 29, 0.18);
+      color: #fecaca;
+      font-size: 0.85rem;
+      line-height: 1.5;
+      overflow-wrap: anywhere;
+    }
+
+    .pipeline-error a {
+      color: #fca5a5;
+      font-weight: 700;
+    }
+
+    .btn-download {
+      color: var(--cyan);
+      text-decoration: none;
+      font-size: 0.8rem;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .btn-download:hover {
+      text-decoration: underline;
+    }
+
+    .empty-state {
+      grid-column: 1 / -1;
+      text-align: center;
+      padding: 60px 20px;
+      color: var(--text-muted);
+    }
+
+    /* API Modal */
+    .modal-overlay {
+      position: fixed;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0, 0, 0, 0.8);
+      backdrop-filter: blur(8px);
+      z-index: 100;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .modal-card {
+      background: #111422;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 18px;
+      width: 100%;
+      max-width: 620px;
+      max-height: 90vh;
+      overflow-y: auto;
+      padding: 28px;
+      box-shadow: 0 25px 60px rgba(0, 0, 0, 0.8);
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      padding-bottom: 14px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .modal-title {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: #fff;
+    }
+
+    .btn-close {
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      font-size: 1.5rem;
+      cursor: pointer;
+      line-height: 1;
+    }
+
+    .btn-close:hover {
+      color: #fff;
+    }
+
+    .api-desc {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      margin-top: 4px;
+      margin-bottom: 8px;
+      line-height: 1.4;
+    }
+
+    .api-desc a {
+      color: var(--cyan);
+      text-decoration: none;
+      font-weight: 600;
+    }
+
+    .api-desc a:hover {
+      text-decoration: underline;
+    }
+
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(120px, 1fr));
+      gap: 14px;
+      margin-bottom: 22px;
+    }
+    .kpi-card {
+      background: rgba(17, 20, 34, 0.82);
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      padding: 16px;
+    }
+    .kpi-label { color: var(--text-muted); font-size: 0.75rem; text-transform: uppercase; letter-spacing: .04em; }
+    .kpi-value { font-size: 1.45rem; font-weight: 800; margin-top: 5px; }
+    .feedback-bar {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 22px;
+      color: var(--text-muted);
+      font-size: 0.82rem;
+      flex-wrap: wrap;
+    }
+    .score-btn {
+      min-width: 34px;
+      padding: 7px 8px;
+      border-radius: 8px;
+      border: 1px solid rgba(255, 255, 255, .12);
+      background: rgba(255, 255, 255, .05);
+      color: #fff;
+      cursor: pointer;
+    }
+    @media (max-width: 1080px) { .kpi-grid { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 600px) { .kpi-grid { grid-template-columns: 1fr; } }
+
+    .login-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 9999;
+      display: grid;
+      place-items: center;
+      padding: 20px;
+      background: rgba(4, 5, 10, 0.94);
+      backdrop-filter: blur(18px);
+    }
+    .login-card {
+      width: min(420px, 100%);
+      position: relative;
+      padding: 32px;
+      border-radius: 18px;
+      border: 1px solid rgba(99, 102, 241, .35);
+      background: #121420;
+      box-shadow: 0 24px 80px rgba(0, 0, 0, .55);
+    }
+    .login-card h2 { margin-bottom: 8px; }
+    .login-card p { color: var(--text-muted); margin-bottom: 22px; }
+    .login-error { color: #fca5a5; min-height: 22px; margin-top: 12px; }
+    .auth-success-overlay {
+      position: absolute;
+      inset: 0;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      gap: 14px;
+      border-radius: 18px;
+      background: rgba(18, 20, 32, 0.96);
+      color: #86efac;
+      font-size: 1.05rem;
+      font-weight: 700;
+      text-align: center;
+      z-index: 2;
+    }
+    .auth-success-check {
+      width: 58px;
+      height: 58px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      background: rgba(16, 185, 129, 0.18);
+      border: 2px solid #34d399;
+      font-size: 30px;
+      animation: auth-success-pop 0.35s ease-out;
+    }
+    @keyframes auth-success-pop {
+      from { opacity: 0; transform: scale(0.55); }
+      to { opacity: 1; transform: scale(1); }
+    }
+    .role-badge { text-transform: uppercase; letter-spacing: .08em; }
+    [data-admin-only] { display: none !important; }
+    body[data-role="admin"] [data-admin-only] { display: inline-flex !important; }
+
+    /* Ottoman-inspired archive & production desk */
+    :root {
+      --parchment: #eee6d5; --ink: #18382f; --green: #154c3a;
+      --red: #9a3029; --gold: #b68b45; --paper: #f8f4ea;
+      --border: #cdbf9f; --muted: #6f715f;
+    }
+    html { color-scheme: light; }
+    body {
+      background-color: var(--parchment);
+      background-image:
+        repeating-linear-gradient(45deg, rgba(21,76,58,.025) 0 1px, transparent 1px 18px),
+        repeating-linear-gradient(-45deg, rgba(154,48,41,.018) 0 1px, transparent 1px 18px);
+      color: var(--ink);
+      font-family: Georgia, "Times New Roman", serif;
+    }
+    body::before {
+      height: 9px; background: repeating-linear-gradient(90deg, var(--gold) 0 16px, var(--red) 16px 32px, var(--green) 32px 48px);
+      opacity: 1;
+    }
+    button, a, input, textarea, select { font-family: inherit; touch-action: manipulation; }
+    :focus-visible { outline: 3px solid rgba(182,139,69,.6); outline-offset: 3px; }
+    .container { max-width: 1380px; padding-top: 18px; }
+    header { min-height: 92px; border-bottom: 2px solid var(--gold); margin-bottom: 22px; }
+    header::after { content: ""; position: absolute; left: 50%; bottom: -7px; width: 54px; height: 12px; background: var(--parchment); border-left: 2px solid var(--gold); border-right: 2px solid var(--gold); transform: translateX(-50%) rotate(45deg); }
+    .logo-icon { width: 50px; height: 50px; border-radius: 50% 50% 48% 48%; background: var(--green); border: 2px solid var(--gold); box-shadow: inset 0 0 0 4px var(--green), inset 0 0 0 5px rgba(240,212,148,.7); }
+    .brand-text h1 { color: var(--ink); font-size: 1.45rem; font-weight: 700; letter-spacing: .04em; background: none; -webkit-text-fill-color: initial; }
+    .brand-text p { color: var(--muted); font-family: Georgia, serif; font-style: italic; letter-spacing: .02em; }
+    .header-actions { gap: 8px; }
+    .api-badge, .btn-settings {
+      min-height: 38px; border: 1px solid var(--border); border-radius: 3px;
+      background: rgba(248,244,234,.92); color: var(--ink); box-shadow: none;
+      font-family: Georgia, serif;
+    }
+    .api-badge.active { background: #dfe8da; border-color: #819b78; color: #234f38; }
+    .btn-settings:hover { color: var(--red); border-color: var(--gold); background: #fffaf0; transform: none; }
+    .dashboard-grid { grid-template-columns: 410px minmax(0,1fr); gap: 22px; }
+    .glass-card, .kpi-card, .feedback-bar {
+      border-radius: 2px; background: rgba(248,244,234,.94); border: 1px solid var(--border);
+      box-shadow: 0 5px 18px rgba(58,49,35,.08); backdrop-filter: none;
+    }
+    .glass-card { background-image: linear-gradient(90deg, transparent 19px, rgba(182,139,69,.12) 20px, transparent 21px); }
+    .card-title { color: var(--ink); font-family: Georgia, serif; letter-spacing: .01em; border-bottom: 1px solid var(--border); padding-bottom: 14px; }
+    .card-subtitle, label, .kpi-label { color: var(--muted); font-family: Georgia, serif; }
+    input, textarea, select { border-radius: 2px; border: 1px solid var(--border); background: #fffdf7; color: var(--ink); box-shadow: inset 0 1px 2px rgba(78,67,48,.06); }
+    input::placeholder, textarea::placeholder { color: #999382; font-style: italic; }
+    select { color-scheme: light; background-color: #fffdf7; }
+    .btn-generate { border-radius: 2px; border: 1px solid #103729; background: var(--green); color: #fffaf0; box-shadow: 0 2px 0 #09281e; min-height: 48px; letter-spacing: .04em; }
+    .btn-generate:hover { background: #0d4030; box-shadow: 0 2px 0 #09281e; transform: none; }
+    .chip, .score-btn { border-radius: 2px; border-color: var(--border); background: #fdfaf3; color: var(--ink); font-family: Georgia, serif; }
+    .chip:hover, .score-btn:hover { border-color: var(--gold); background: #fff; color: var(--red); }
+    .kpi-grid { grid-template-columns: repeat(5,1fr); gap: 14px; }
+    .kpi-card { min-height: 102px; text-align: center; border-top: 4px solid var(--green); }
+    .kpi-value { color: var(--red); font-family: Georgia, serif; font-variant-numeric: tabular-nums; }
+    .feedback-bar { padding: 10px 14px; }
+    .login-overlay {
+      background-color: #18382f;
+      background-image: radial-gradient(circle at 20px 20px, rgba(238,230,213,.06) 2px, transparent 3px);
+      background-size: 40px 40px; backdrop-filter: none;
+    }
+    .login-card {
+      width: min(760px,100%); min-height: 520px; padding: 0;
+      display: grid; grid-template-columns: 44% 56%;
+      border: 1px solid #d7bd80; border-radius: 3px;
+      background: var(--paper); box-shadow: 0 30px 90px rgba(5,18,14,.55);
+      overflow: hidden;
+    }
+    .login-card::before {
+      content: "☾  O T T O M A N  E M P I R E";
+      grid-column: 1; grid-row: 1;
+      display: flex; align-items: flex-end; justify-content: center;
+      padding: 40px 28px; color: #f7edcf; text-align: center;
+      font-size: 1rem; letter-spacing: .16em;
+      background: linear-gradient(rgba(21,76,58,.86),rgba(9,43,33,.96)), repeating-linear-gradient(45deg,#18382f 0 8px,#21584a 8px 16px);
+      border-right: 4px solid var(--gold);
+    }
+    .login-card > :not(.auth-success-overlay) { grid-column: 2; }
+    .login-card h2 { align-self: end; color: var(--ink); margin: 52px 36px 8px !important; font-family: Georgia,serif; }
+    .login-card p { margin: 0 36px 22px !important; color: var(--muted); line-height: 1.55; }
+    .login-card .form-row, .login-card .form-group, .login-card #loginError { margin-left: 36px; margin-right: 36px; }
+    .login-card #authSubmitButton { width: calc(100% - 72px); margin: 0 36px; }
+    .login-card .btn-settings { border-radius: 2px; }
+    .login-card::after { content: ""; position:absolute; left: 44%; top: -30px; width: 60px; height: 60px; border: 2px solid var(--gold); border-radius: 50%; background: var(--paper) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpath d='M58 18a32 32 0 1 0 12 53A38 38 0 0 1 58 18Z' fill='%23154c3a'/%3E%3Cpath d='M64 19l3 9 9-3-6 8 8 6-10 1 1 10-5-8-7 7 2-10-10-2 9-5Z' fill='%23b68b45'/%3E%3C/svg%3E") center/70% no-repeat; transform: translate(-50%,0); z-index:2; }
+    .auth-success-overlay { background: rgba(248,244,234,.97); color: var(--green); }
+    @media (max-width:900px) {
+      .dashboard-grid { grid-template-columns:1fr; }
+      .kpi-grid { grid-template-columns:repeat(3,1fr); }
+    }
+    @media (max-width:640px) {
+      .container { padding:10px 12px 28px; }
+      header { padding-bottom:14px; }
+      .header-actions { width:100%; }
+      .kpi-grid { grid-template-columns:repeat(2,1fr); }
+      .login-card { width:min(430px,100%); display:block; min-height:0; }
+      .login-card::before { min-height:150px; border-right:0; border-bottom:4px solid var(--gold); }
+      .login-card::after { left:auto; right:18px; top:-30px; transform:none; }
+      .login-card > :not(.auth-success-overlay) { display:block; }
+      .login-card h2 { margin-top:30px !important; }
+      .login-card .form-row, .login-card .form-group, .login-card #loginError { margin-left:24px; margin-right:24px; }
+      .login-card #authSubmitButton { width:calc(100% - 48px); margin:0 24px 24px; }
+      .login-card p { margin-left:24px!important; margin-right:24px!important; }
+      .login-card h2 { margin-left:24px!important; margin-right:24px!important; }
+    }
+    @media (prefers-reduced-motion:reduce) { *,*::before,*::after { animation-duration:.01ms!important; animation-iteration-count:1!important; transition-duration:.01ms!important; } }
+
+    /* Premium cinematic workspace */
+    :root {
+      --bg: #08090a;
+      --panel: #111214;
+      --panel-2: #17181b;
+      --line: rgba(255,255,255,.105);
+      --soft-line: rgba(255,255,255,.065);
+      --lime: #baff29;
+      --text: #f7f7f5;
+      --muted: #96989d;
+    }
+    html { color-scheme: dark; }
+    body {
+      font-family: "Plus Jakarta Sans", Arial, sans-serif;
+      background: var(--bg);
+      background-image: radial-gradient(circle at 78% 8%, rgba(186,255,41,.035), transparent 24%);
+      color: var(--text);
+      overflow-x: hidden;
+    }
+    body::before { height: 1px; background: var(--lime); opacity: .55; }
+    header {
+      min-height: 82px;
+      margin-bottom: 18px;
+      padding: 0 0 18px;
+      background: transparent;
+      border-bottom: 1px solid var(--line);
+      align-items: center;
+    }
+    header::before, header::after { display: none; }
+    .logo-icon {
+      width: 42px; height: 42px; border-radius: 50%;
+      background: var(--lime); border: 0;
+      box-shadow: 0 0 28px rgba(186,255,41,.12);
+    }
+    .logo-icon::after { content: ""; width: 17px; height: 17px; border: 2px solid #090a0a; border-radius: 50% 50% 50% 2px; transform: rotate(-45deg); }
+    .brand-text h1 {
+      font-family: "Plus Jakarta Sans", Arial, sans-serif;
+      font-size: 1.18rem; letter-spacing: -.025em; color: var(--text);
+    }
+    .brand-text p { color: var(--muted); font-family: inherit; font-size: .68rem; letter-spacing: .02em; text-transform: none; font-style: normal; }
+    .api-badge, .btn-settings {
+      border-radius: 999px; border: 1px solid var(--line);
+      background: rgba(255,255,255,.025); color: #d9d9d6;
+      box-shadow: none; font-family: inherit; font-size: .76rem;
+    }
+    .btn-settings:hover, .header-actions a[data-admin-only]:hover {
+      color: var(--text) !important; border-color: rgba(255,255,255,.24) !important; background: rgba(255,255,255,.065) !important;
+    }
+    .api-badge.active { border-color: rgba(186,255,41,.32); background: rgba(186,255,41,.08); color: var(--lime); }
+    .role-badge { color: var(--lime) !important; border-color: rgba(186,255,41,.22) !important; }
+
+    .container { max-width: 1440px; padding-top: 22px; }
+    .kpi-grid { gap: 10px; margin-bottom: 14px; }
+    .kpi-card {
+      min-height: 92px; border-radius: 14px; border: 1px solid var(--soft-line);
+      background: var(--panel); box-shadow: none; text-align: left; padding-left: 18px;
+    }
+    .kpi-card::before, .kpi-card::after { display: none; }
+    .kpi-label { padding-top: 0; color: var(--muted); font-family: inherit; font-size: .65rem; letter-spacing: .04em; text-transform: uppercase; }
+    .kpi-value { margin-top: 7px; color: var(--text); font-family: inherit; font-size: 1.55rem; letter-spacing: -.04em; }
+    .feedback-bar {
+      min-height: 48px; border-radius: 12px; border: 1px solid var(--soft-line);
+      background: rgba(255,255,255,.018); padding: 7px 9px 7px 14px; color: var(--muted);
+    }
+    .score-btn { width: 30px; height: 30px; border-radius: 50%; border-color: var(--soft-line); background: transparent; color: var(--muted); font-family: inherit; }
+    .score-btn:hover { border-color: var(--lime); color: var(--lime); }
+
+    .dashboard-grid { grid-template-columns: minmax(350px, 410px) minmax(0,1fr); gap: 14px; margin-top: 14px; }
+    .glass-card {
+      border-radius: 18px; border: 1px solid var(--soft-line); background: var(--panel);
+      box-shadow: none; overflow: hidden; padding: 24px;
+      background-image: none;
+    }
+    .glass-card::before, .glass-card::after { display: none; }
+    .card-title {
+      border-bottom: 0; padding-bottom: 0; color: var(--text); font-family: inherit;
+      font-size: 1.08rem; letter-spacing: -.025em;
+    }
+    .card-title svg { stroke: var(--lime) !important; }
+    .card-subtitle { color: var(--muted); font-family: inherit; font-style: normal; line-height: 1.55; }
+    .topics-label { color: var(--muted); text-transform: none; letter-spacing: 0; font-size: .76rem; font-family: inherit; }
+    .chip {
+      border-radius: 999px; border: 1px solid var(--soft-line); border-bottom-width: 1px;
+      background: #17181a; color: #cfd0d2; font-family: inherit;
+    }
+    .chip:hover { border-color: rgba(186,255,41,.45); background: rgba(186,255,41,.07); color: var(--lime); }
+    label { color: #b8b9bd; font-family: inherit; font-size: .7rem; font-weight: 600; letter-spacing: .02em; text-transform: none; }
+    input, textarea, select {
+      border-radius: 9px; border: 1px solid var(--line); background: #0c0d0e;
+      color: var(--text); box-shadow: none; font-family: inherit;
+    }
+    input::placeholder, textarea::placeholder { color: #626469; font-style: normal; }
+    input:focus, textarea:focus, select:focus { border-color: rgba(186,255,41,.55); box-shadow: 0 0 0 3px rgba(186,255,41,.06); }
+    select, select option { color-scheme: dark; background-color: #0c0d0e; }
+    .btn-generate {
+      min-height: 48px; border-radius: 999px; border: 0; background: var(--lime);
+      color: #090a09; box-shadow: none; font-family: inherit; font-size: .82rem; font-weight: 800; letter-spacing: 0; text-transform: none;
+    }
+    .btn-generate:hover { background: #cdff6b; box-shadow: 0 0 30px rgba(186,255,41,.13); }
+
+    .pipeline-status-card {
+      border-radius: 14px; border: 1px solid var(--soft-line); border-left-width: 1px;
+      background: #0d0e0f;
+    }
+    .pipeline-status-card > div:first-child strong { color: var(--text) !important; font-family: inherit; }
+    .step-item { border-bottom-color: var(--soft-line); color: var(--muted); font-family: inherit; }
+    .step-item.active, .step-item.complete { background: rgba(186,255,41,.025); color: var(--text); }
+    .step-icon { border: 1px solid var(--line); background: var(--panel-2); color: var(--lime); }
+    .badge-status { border-radius: 999px; border-color: var(--soft-line); color: var(--text); }
+
+    .gallery-header { border-bottom-color: var(--soft-line); }
+    .refresh-btn, .delete-btn {
+      border-radius: 999px; border-color: var(--line); background: transparent; color: var(--text); font-family: inherit;
+    }
+    .delete-btn:not(:disabled):hover, .refresh-btn:hover { border-color: var(--lime); color: var(--lime); }
+    .video-grid { grid-template-columns: repeat(auto-fill, minmax(210px,1fr)); gap: 12px; }
+    .video-card { border-radius: 14px; border: 1px solid var(--soft-line); background: #0d0e0f; box-shadow: none; }
+    .video-card:hover { border-color: rgba(186,255,41,.35); box-shadow: 0 16px 36px rgba(0,0,0,.28); }
+    .video-card.selected { border: 1px solid var(--lime); box-shadow: 0 0 0 3px rgba(186,255,41,.08); }
+    .video-player-wrapper { border-bottom: 0; }
+    .video-details { background: #0d0e0f; }
+    .video-topic, .video-meta { color: var(--text); }
+    .btn-download { border-radius: 999px; border-color: rgba(186,255,41,.5); background: var(--lime); color: #080908; }
+    .empty-state { border-radius: 14px; border: 1px dashed var(--line); background: rgba(255,255,255,.012); color: var(--muted); }
+
+    .login-overlay {
+      background:
+        linear-gradient(rgba(8,9,10,.72), rgba(8,9,10,.94)),
+        repeating-linear-gradient(90deg, transparent 0 119px, rgba(255,255,255,.018) 120px);
+      backdrop-filter: blur(18px);
+    }
+    .login-card {
+      width: min(940px, 94vw); min-height: 580px; display: grid;
+      grid-template-columns: 1fr 390px; grid-template-rows: auto;
+      border-radius: 22px; border: 1px solid var(--line); background: var(--panel);
+      box-shadow: 0 40px 120px rgba(0,0,0,.72); overflow: hidden;
+    }
+    .login-card::before {
+      grid-column: 1; grid-row: 1 / span 8; min-height: 580px;
+      align-items: flex-start; justify-content: flex-end;
+      padding: 38px; border-right: 0; border-bottom: 0;
+      content: "FRAME / 01\A  CREATE WITHOUT LIMITS";
+      white-space: pre-line; text-align: left;
+      color: var(--text); font-family: inherit; font-size: clamp(1.9rem,4vw,3.8rem);
+      font-weight: 800; letter-spacing: -.06em; line-height: .92;
+      background:
+        linear-gradient(180deg, rgba(8,9,10,.05) 15%, rgba(8,9,10,.92) 100%),
+        radial-gradient(circle at 72% 32%, rgba(186,255,41,.3), transparent 9%),
+        radial-gradient(ellipse at 52% 58%, rgba(255,255,255,.12), transparent 12%),
+        repeating-linear-gradient(145deg, #111214 0 38px, #1b1c20 39px 40px, #0d0e10 41px 70px);
+    }
+    .login-card::after { display: none; }
+    .login-card > :not(.auth-success-overlay) { grid-column: 2; }
+    .login-card h2 { align-self: end; margin: 48px 32px 8px !important; font-family: inherit; font-size: 1.55rem; letter-spacing: -.04em; color: var(--text); }
+    .login-card p { margin: 0 32px 22px !important; color: var(--muted); font-family: inherit; font-style: normal; }
+    .login-card .form-row, .login-card .form-group, .login-card #loginError { margin-left: 32px; margin-right: 32px; }
+    .login-card #authSubmitButton { width: calc(100% - 64px); margin: 0 32px; }
+    .login-card .btn-settings { border-radius: 999px; background: transparent; color: var(--muted); }
+    .auth-success-overlay { border-radius: 22px; background: rgba(17,18,20,.97); color: var(--lime); }
+
+    .modal-overlay { background: rgba(0,0,0,.78); backdrop-filter: blur(10px); }
+    .modal-card { border-radius: 18px; border: 1px solid var(--line); background: var(--panel); box-shadow: 0 40px 100px rgba(0,0,0,.65); }
+    .modal-header { border-bottom-color: var(--soft-line); background: var(--panel); }
+    .modal-title { color: var(--text); font-family: inherit; }
+    .btn-close { border-color: var(--line); background: transparent; color: var(--text); }
+    .modal-card .form-group { border-color: var(--soft-line) !important; background: rgba(255,255,255,.018) !important; border-radius: 12px !important; }
+    .api-desc { color: var(--muted) !important; font-family: inherit; }
+    .api-desc strong, .api-desc a { color: var(--lime) !important; }
+
+    @media (max-width:900px) {
+      .dashboard-grid { grid-template-columns: 1fr; }
+      .login-card { grid-template-columns: 1fr 360px; }
+    }
+    @media (max-width:640px) {
+      .container { padding-top: 14px; }
+      header { min-height: 0; }
+      .brand-text p { display:none; }
+      .dashboard-grid { gap: 12px; }
+      .glass-card { padding: 20px 16px; border-radius: 14px; }
+      .kpi-grid { grid-template-columns: repeat(2,minmax(0,1fr)); gap: 8px; }
+      .kpi-card { min-height: 86px; padding-left: 14px; }
+      .login-card { min-height: 0; display:block; width:min(430px,94vw); }
+      .login-card::before { min-height:210px; content:"CREATE\A WITHOUT LIMITS"; padding:28px; font-size:2rem; border-bottom:1px solid var(--line); }
+      .login-card > :not(.auth-success-overlay) { display:block; }
+      .login-card h2 { margin-top:28px!important; }
+      .login-card .form-row, .login-card .form-group, .login-card #loginError { margin-left:24px; margin-right:24px; }
+      .login-card #authSubmitButton { width:calc(100% - 48px); margin:0 24px 24px; }
+      .login-card p { margin-left:24px!important; margin-right:24px!important; }
+      .login-card h2 { margin-left:24px!important; margin-right:24px!important; }
+      .video-grid { grid-template-columns: 1fr; }
+    }
+
+    /* Complete imperial workspace */
+    .container { padding-top: 26px; padding-bottom: 64px; }
+    header { position: relative; padding: 0 18px 18px; background: rgba(248,244,234,.6); }
+    header::before {
+      content: "DVLET • İŞLEM MİHMANI";
+      position: absolute; left: 82px; top: 0;
+      font-family: Georgia, serif; font-size: 9px; letter-spacing: .28em; color: var(--gold);
+    }
+    .logo-icon::after {
+      content: "♛"; font-family: Georgia, serif; font-size: 24px; color: #f1d89a;
+      line-height: 1;
+    }
+    .logo-icon svg { display: none; }
+    .brand-text p { font-size: .76rem; letter-spacing: .06em; text-transform: uppercase; }
+    .header-actions .btn-settings { text-decoration: none; font-size: .78rem; }
+    .header-actions a[data-admin-only] { color: var(--ink) !important; background: var(--paper) !important; border-color: var(--border) !important; }
+    .role-badge { border-color: var(--gold) !important; color: var(--red) !important; }
+
+    .kpi-grid { position: relative; }
+    .kpi-card {
+      position: relative; overflow: hidden; min-height: 112px;
+      display: flex; flex-direction: column; justify-content: center;
+    }
+    .kpi-card::before {
+      content: ""; position: absolute; left: 50%; top: 10px; width: 28px; height: 28px;
+      border: 1px solid rgba(182,139,69,.28); transform: translateX(-50%) rotate(45deg);
+    }
+    .kpi-card::after {
+      content: ""; position: absolute; bottom: 0; left: 12%; right: 12%; height: 2px;
+      background: linear-gradient(90deg, transparent, var(--gold), transparent);
+    }
+    .kpi-label { padding-top: 25px; font-size: .69rem; letter-spacing: .11em; }
+    .kpi-value { font-size: 1.9rem; }
+    .feedback-bar { min-height: 58px; padding-left: 18px; border-left: 5px solid var(--red); }
+    .score-btn { width: 32px; height: 32px; padding: 0; border-radius: 50%; }
+
+    .dashboard-grid { margin-top: 18px; align-items: start; }
+    .glass-card { padding: 28px; }
+    .glass-card::before, .glass-card::after {
+      content: ""; position: absolute; width: 25px; height: 25px; pointer-events: none;
+    }
+    .glass-card::before { left: 8px; top: 8px; border-left: 2px solid var(--gold); border-top: 2px solid var(--gold); }
+    .glass-card::after { right: 8px; bottom: 8px; border-right: 2px solid var(--gold); border-bottom: 2px solid var(--gold); }
+    .card-title { display: flex; align-items: center; gap: 10px; font-size: 1.25rem; }
+    .card-title svg { stroke: var(--red) !important; }
+    .card-subtitle { margin-top: 10px; font-style: italic; }
+    .popular-topics { margin-bottom: 22px; }
+    .topics-label { color: var(--muted); font-size: .72rem; letter-spacing: .12em; text-transform: uppercase; }
+    .topic-chips { margin-top: 8px; gap: 7px; }
+    .chip { font-size: .78rem; padding: 8px 10px; border-bottom-width: 2px; }
+    .form-group { margin-bottom: 18px; }
+    .form-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+    label { font-size: .78rem; font-weight: 700; letter-spacing: .025em; text-transform: uppercase; }
+    input, textarea, select { min-height: 44px; padding: 11px 12px; font-size: .92rem; }
+    textarea { min-height: 110px; resize: vertical; }
+    input:focus, textarea:focus, select:focus { border-color: var(--gold); box-shadow: 0 0 0 3px rgba(182,139,69,.12); }
+    .btn-generate { text-transform: uppercase; font-size: .83rem; letter-spacing: .09em; }
+
+    .pipeline-status-card {
+      margin-top: 22px; padding: 18px; border-radius: 2px;
+      border: 1px solid var(--border); border-left: 4px solid var(--gold);
+      background: #f2ebda;
+    }
+    .pipeline-status-card > div:first-child strong { color: var(--ink) !important; font-family: Georgia, serif; }
+    .pipeline-steps { gap: 8px; }
+    .step-item { padding: 10px 8px !important; border-bottom: 1px solid rgba(205,191,159,.75); color: var(--muted); }
+    .step-item.active, .step-item.complete { color: var(--ink); background: rgba(255,255,255,.5); }
+    .step-icon { border-radius: 50%; border: 1px solid var(--gold); background: var(--paper); color: var(--red); }
+    .badge-status { border-radius: 2px; border: 1px solid var(--border); color: var(--ink); }
+
+    .gallery-header { padding-bottom: 18px; border-bottom: 1px solid var(--border); }
+    .gallery-actions { gap: 8px; }
+    .refresh-btn, .delete-btn {
+      min-height: 36px; border-radius: 2px; border: 1px solid var(--border);
+      background: var(--paper); color: var(--ink); font-family: Georgia, serif;
+    }
+    .delete-btn:not(:disabled):hover, .refresh-btn:hover { color: var(--red); border-color: var(--gold); }
+    .video-grid { grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 14px; padding-top: 20px; }
+    .video-card {
+      border-radius: 2px; border: 1px solid var(--border); background: var(--paper);
+      box-shadow: 0 4px 12px rgba(58,49,35,.08); overflow: hidden;
+    }
+    .video-card:hover { transform: translateY(-3px); border-color: var(--gold); box-shadow: 0 8px 20px rgba(58,49,35,.14); }
+    .video-card.selected { border: 2px solid var(--red); box-shadow: 0 0 0 3px rgba(154,48,41,.1); }
+    .video-player-wrapper { border-bottom: 3px solid var(--green); }
+    .video-details { background: var(--paper); }
+    .video-topic, .video-meta { color: var(--ink); }
+    .btn-download { border-radius: 2px; border: 1px solid var(--green); background: var(--green); color: #fffaf0; }
+    .empty-state { border-radius: 2px; border: 1px dashed var(--border); background: rgba(238,230,213,.35); color: var(--muted); }
+
+    .modal-overlay { background: rgba(24,56,47,.78); backdrop-filter: blur(4px); }
+    .modal-card {
+      width: min(780px, calc(100% - 32px)); max-height: 88vh; padding: 0;
+      border-radius: 3px; border: 1px solid var(--gold); background: var(--paper);
+      box-shadow: 0 30px 90px rgba(5,18,14,.5);
+    }
+    .modal-header { margin: 0; padding: 20px 24px; border-bottom: 1px solid var(--border); background: #efe6d2; }
+    .modal-title { color: var(--ink); font-family: Georgia, serif; }
+    .btn-close { width: 34px; height: 34px; border: 1px solid var(--border); border-radius: 50%; background: transparent; color: var(--ink); }
+    .modal-card form { padding: 24px; }
+    .modal-card .form-group { border-color: var(--border) !important; background: rgba(255,253,247,.8) !important; border-radius: 2px !important; }
+    .api-desc { color: var(--muted) !important; font-family: Georgia, serif; }
+    .api-desc strong, .api-desc a { color: var(--red) !important; }
+
+    @media (max-width:900px) {
+      header { align-items: flex-start; }
+      .header-actions { width: 100%; }
+      .form-row { grid-template-columns: 1fr 1fr; }
+      .video-grid { grid-template-columns: repeat(2,minmax(0,1fr)); }
+    }
+    @media (max-width:640px) {
+      header::before { display:none; }
+      header { padding-left:0; padding-right:0; }
+      .brand-text h1 { font-size:1.15rem; }
+      .dashboard-grid { gap:14px; }
+      .glass-card { padding:20px 18px; }
+      .kpi-grid { grid-template-columns: repeat(2,minmax(0,1fr)); gap:8px; }
+      .kpi-card { min-height:96px; }
+      .feedback-bar { align-items:flex-start; }
+      .form-row { grid-template-columns:1fr; }
+      .gallery-header { align-items:flex-start; }
+      .gallery-actions { width:100%; flex-wrap:wrap; }
+      .video-grid { grid-template-columns: 1fr; }
+    }
+    .marketing-page { min-height: 100vh; position: relative; z-index: 2; }
+    .container { display: none; }
+    body.app-active .container { display: block; }
+    body.app-active .marketing-page { display: none; }
+    .login-overlay { display: none !important; }
+    .login-overlay.is-open { display: grid !important; }
+    .marketing-nav {
+      height: 82px; max-width: 1440px; margin: 0 auto; padding: 0 28px;
+      display: grid; grid-template-columns: 1fr auto 1fr; align-items: center;
+      border-bottom: 1px solid var(--line);
+    }
+    .marketing-brand { display:flex; align-items:center; gap:10px; color:var(--text); text-decoration:none; font-weight:800; letter-spacing:-.03em; }
+    .marketing-mark { width:25px; height:25px; border-radius:50%; border:7px solid var(--lime); border-right-color:transparent; transform:rotate(-35deg); }
+    .marketing-links { display:flex; gap:34px; }
+    .marketing-links a { color:#bbbcc0; text-decoration:none; font-size:.78rem; }
+    .marketing-links a:hover { color:var(--lime); }
+    .marketing-login {
+      justify-self:end; min-width:94px; height:38px; border-radius:999px;
+      border:1px solid var(--line); background:transparent; color:var(--text); font-weight:700; cursor:pointer;
+    }
+    .marketing-hero {
+      max-width:1440px; min-height:680px; margin:0 auto; padding:70px 28px 82px;
+      display:grid; grid-template-columns:minmax(0,1fr) minmax(460px,.9fr); gap:70px; align-items:center;
+    }
+    .eyebrow, .section-heading > span, .about-section > span { color:var(--lime); font-size:.68rem; font-weight:800; letter-spacing:.18em; }
+    .marketing-copy h1 { max-width:760px; margin:22px 0 24px; font-size:clamp(3.6rem,7vw,7.2rem); line-height:.88; letter-spacing:-.07em; text-wrap:balance; }
+    .marketing-copy > p { max-width:590px; color:#aaaab0; font-size:1.05rem; line-height:1.65; }
+    .marketing-actions { display:flex; gap:12px; margin-top:32px; }
+    .marketing-primary, .marketing-secondary {
+      height:50px; padding:0 22px; border-radius:999px; display:inline-flex; align-items:center; justify-content:center;
+      font-weight:800; text-decoration:none; cursor:pointer;
+    }
+    .marketing-primary { border:0; background:var(--lime); color:#090a09; gap:30px; }
+    .marketing-secondary { border:1px solid var(--line); color:var(--text); }
+    .marketing-primary:hover { background:#d0ff78; }
+    .marketing-proof { display:grid; grid-template-columns:repeat(3,max-content); gap:4px 36px; margin-top:44px; }
+    .marketing-proof strong { grid-row:1; font-size:1.15rem; }
+    .marketing-proof span { grid-row:2; color:#777980; font-size:.66rem; text-transform:uppercase; letter-spacing:.08em; }
+    .marketing-reel { height:530px; display:grid; grid-template-columns:1fr 170px; gap:12px; perspective:1200px; }
+    .reel-frame { position:relative; overflow:hidden; border-radius:18px; border:1px solid rgba(255,255,255,.12); background:#15161a; }
+    .reel-main { background:linear-gradient(180deg,transparent 35%,rgba(0,0,0,.8)),radial-gradient(circle at 30% 30%,#dcd9c8,transparent 10%),linear-gradient(145deg,#526e6b,#101817 55%,#8b4f32); transform:rotateY(-5deg) rotateZ(1deg); box-shadow:-30px 40px 80px rgba(0,0,0,.45); }
+    .reel-glow { position:absolute; width:170px; height:170px; left:18%; top:28%; border-radius:50%; border:1px solid rgba(186,255,41,.5); box-shadow:0 0 60px rgba(186,255,41,.25),inset 0 0 30px rgba(186,255,41,.12); }
+    .reel-label { position:absolute; left:24px; top:22px; font-size:.58rem; letter-spacing:.16em; }
+    .reel-title { position:absolute; left:24px; bottom:55px; font-size:clamp(2.6rem,5vw,5.5rem); font-weight:800; line-height:.78; letter-spacing:-.08em; }
+    .reel-play { position:absolute; right:22px; bottom:22px; width:46px; height:46px; border-radius:50%; border:0; background:var(--lime); color:#090a09; }
+    .reel-stack { display:grid; gap:12px; }
+    .reel-small { min-height:259px; }
+    .reel-small span { position:absolute; bottom:16px; left:16px; font-size:.55rem; letter-spacing:.12em; }
+    .reel-one { background:linear-gradient(180deg,transparent,#08090a),linear-gradient(140deg,#5d291f,#e3ad7c 50%,#1a2220); }
+    .reel-two { background:linear-gradient(180deg,transparent,#08090a),linear-gradient(150deg,#9aa5af,#26353e 55%,#c2b49b); }
+    .showcase-section { max-width:1440px; margin:0 auto; padding:100px 28px; border-top:1px solid var(--line); }
+    .section-heading { display:flex; justify-content:space-between; align-items:end; margin-bottom:36px; }
+    .section-heading h2 { max-width:620px; margin:0; font-size:clamp(2.4rem,5vw,5rem); line-height:.92; letter-spacing:-.06em; text-align:right; }
+    .showcase-grid { display:grid; grid-template-columns:1.2fr 1fr 1fr; gap:14px; }
+    .showcase-grid article h3 { margin:14px 0 5px; font-size:1rem; }
+    .showcase-grid article p { margin:0; color:#777980; font-size:.75rem; }
+    .showcase-image { height:420px; border-radius:16px; position:relative; overflow:hidden; }
+    .showcase-one { background:linear-gradient(180deg,transparent,#090a0a),linear-gradient(135deg,#b5a58d,#3e2e27 55%,#e45e32); }
+    .showcase-two { background:linear-gradient(180deg,transparent,#090a0a),linear-gradient(150deg,#9ea8a3,#1f3739 55%,#d0bd9b); }
+    .showcase-three { background:linear-gradient(180deg,transparent,#090a0a),linear-gradient(145deg,#6f6d5c,#181a19 55%,#c49a64); }
+    .showcase-image button { position:absolute; left:18px; bottom:18px; width:44px; height:44px; border:0; border-radius:50%; background:#fff; color:#111; }
+    .feature-strip { max-width:1384px; margin:0 auto 100px; display:grid; grid-template-columns:repeat(3,1fr); border-top:1px solid var(--line); border-bottom:1px solid var(--line); }
+    .feature-strip article { min-height:230px; padding:34px; border-right:1px solid var(--line); }
+    .feature-strip article:last-child { border-right:0; }
+    .feature-strip span { color:var(--lime); font-size:.68rem; }
+    .feature-strip h3 { margin-top:70px; font-size:1.25rem; }
+    .feature-strip p { max-width:340px; color:#85868b; line-height:1.55; font-size:.86rem; }
+    .about-section { max-width:900px; margin:0 auto; padding:110px 28px 140px; text-align:center; }
+    .about-section h2 { margin:24px 0; font-size:clamp(2.8rem,6vw,6rem); line-height:.92; letter-spacing:-.06em; }
+    .about-section p { max-width:650px; margin:0 auto; color:#929399; line-height:1.7; }
+    @media(max-width:900px) {
+      .marketing-nav { grid-template-columns:1fr auto; }
+      .marketing-links { display:none; }
+      .marketing-hero { grid-template-columns:1fr; gap:45px; min-height:0; }
+      .marketing-reel { height:430px; }
+      .showcase-grid { grid-template-columns:1fr 1fr; }
+      .showcase-grid article:last-child { grid-column:span 2; }
+      .feature-strip { grid-template-columns:1fr; margin:0 28px 80px; }
+      .feature-strip article { border-right:0; border-bottom:1px solid var(--line); }
+    }
+    @media(max-width:640px) {
+      .marketing-nav { height:70px; padding:0 16px; }
+      .marketing-brand { font-size:.92rem; }
+      .marketing-login { min-width:78px; }
+      .marketing-hero { padding:48px 16px 64px; }
+      .marketing-copy h1 { font-size:3.5rem; }
+      .marketing-actions { flex-direction:column; align-items:stretch; }
+      .marketing-primary,.marketing-secondary { width:100%; }
+      .marketing-proof { grid-template-columns:repeat(3,1fr); gap:5px 10px; }
+      .marketing-reel { height:390px; grid-template-columns:1fr 100px; }
+      .reel-stack .reel-small { min-height:189px; }
+      .showcase-section { padding:70px 16px; }
+      .section-heading { display:block; }
+      .section-heading h2 { text-align:left; margin-top:18px; font-size:3rem; }
+      .showcase-grid { grid-template-columns:1fr; }
+      .showcase-grid article:last-child { grid-column:auto; }
+      .showcase-image { height:360px; }
+    }
+
+    /* Authenticated studio shell */
+    body.app-active header {
+      position: sticky; top: 0; z-index: 30; min-height: 72px;
+      margin: 0 -28px 24px; padding: 14px 28px;
+      background: rgba(8,9,10,.94); backdrop-filter: blur(18px);
+      border-bottom: 1px solid var(--line); border-radius: 0;
+    }
+    body.app-active header .logo-icon { width: 38px; height: 38px; }
+    body.app-active header .brand-text h1 { font-size: 1rem; }
+    body.app-active .header-actions {
+      max-width: calc(100% - 260px); justify-content: flex-end;
+      flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none;
+    }
+    body.app-active .header-actions::-webkit-scrollbar { display:none; }
+    body.app-active .header-actions .api-badge,
+    body.app-active .header-actions .btn-settings { flex: 0 0 auto; }
+    body.app-active .container { display:block !important; max-width:none; padding-top:0; }
+    body.app-active .kpi-grid {
+      grid-template-columns: repeat(5, minmax(170px, 1fr));
+      overflow-x: auto; padding-bottom:3px;
+    }
+    body.app-active .kpi-card {
+      min-height:100px; border-radius:12px; background:#101113;
+      box-shadow:inset 0 1px rgba(255,255,255,.02);
+    }
+    body.app-active .kpi-card:first-child { border-top:1px solid rgba(186,255,41,.35); }
+    body.app-active .feedback-bar { border-left:0; justify-content:flex-end; }
+    body.app-active .feedback-bar > span { margin-right:auto; }
+    body.app-active .dashboard-grid { grid-template-columns:minmax(340px,410px) minmax(0,1fr); gap:16px; }
+    body.app-active .glass-card { border-radius:14px; background:#101113; }
+    body.app-active .glass-card:first-child { position:sticky; top:112px; }
+    body.app-active .preset-container { margin-bottom:22px; }
+    body.app-active .preset-container label { display:block; margin-bottom:9px; }
+    body.app-active .chips { flex-wrap:wrap; gap:7px; }
+    body.app-active .chip { border-radius:7px; }
+    body.app-active textarea { min-height:118px; }
+    body.app-active .pipeline-status-card { background:#0b0c0d; }
+    body.app-active .gallery-header { position:sticky; top:0; z-index:4; padding-top:2px; background:#101113; }
+    body.app-active .gallery-actions .delete-btn,
+    body.app-active .gallery-actions .refresh-btn { font-size:.72rem; }
+    body.app-active .logo-icon::after { border-color:#080908; }
+
+    @media(max-width:900px) {
+      body.app-active header { margin:0 -20px 18px; padding:12px 20px; }
+      body.app-active .header-actions { max-width:none; width:100%; justify-content:flex-start; }
+      body.app-active .dashboard-grid { grid-template-columns:1fr; }
+      body.app-active .glass-card:first-child { position:static; }
+    }
+    @media(max-width:640px) {
+      body.app-active header { position:relative; margin:0 -16px 16px; padding:12px 16px; }
+      body.app-active .brand-text p { display:none; }
+      body.app-active .kpi-grid { grid-template-columns:repeat(5,150px); }
+      body.app-active .feedback-bar { justify-content:flex-start; flex-wrap:wrap; }
+      body.app-active .feedback-bar > span { width:100%; }
+    }
+
+    /* Rebuilt authenticated creative workspace */
+    .studio-intro { display:none; }
+    body.app-active .studio-intro {
+      display:flex; align-items:flex-end; justify-content:space-between;
+      margin:0 0 18px; padding:6px 0 18px;
+      border-bottom:1px solid var(--soft-line);
+    }
+    body.app-active .studio-intro span { color:var(--lime); font-size:.66rem; font-weight:800; letter-spacing:.16em; }
+    body.app-active .studio-intro h2 { margin:7px 0 0; font-size:2rem; letter-spacing:-.055em; }
+    body.app-active .studio-intro p { margin:0; color:var(--muted); font-size:.78rem; }
+    body.app-active .container { padding-left:28px; padding-right:28px; }
+    body.app-active header { margin-left:-28px; margin-right:-28px; }
+    body.app-active header .brand-text p { color:#777980; }
+    body.app-active .header-actions { gap:6px; }
+    body.app-active .header-actions .api-badge { display:none; }
+    body.app-active .header-actions [data-admin-only] { display:none !important; }
+    body.app-active[data-role="admin"] .header-actions [data-admin-only] { display:inline-flex !important; }
+    body.app-active[data-role="admin"] .header-actions a[data-admin-only],
+    body.app-active[data-role="admin"] .header-actions button[data-admin-only]:not(:last-of-type) {
+      width:38px; min-width:38px; height:38px; overflow:hidden;
+      justify-content:center; padding:0 12px; font-size:0;
+    }
+    body.app-active[data-role="admin"] .header-actions a[data-admin-only]::first-letter,
+    body.app-active[data-role="admin"] .header-actions button[data-admin-only]:not(:last-of-type)::first-letter { font-size:16px; }
+    body.app-active .kpi-grid { grid-template-columns:repeat(5,1fr); gap:8px; }
+    body.app-active .kpi-card {
+      min-height:108px; border-radius:14px; align-items:flex-start; justify-content:flex-end;
+      padding:16px; background:linear-gradient(145deg,#141518,#0d0e10);
+    }
+    body.app-active .kpi-card::before {
+      display:block; top:14px; right:14px; left:auto; width:8px; height:8px;
+      border:0; border-radius:50%; background:rgba(186,255,41,.8);
+      box-shadow:0 0 18px rgba(186,255,41,.32); transform:none;
+    }
+    body.app-active .kpi-label { font-size:.62rem; }
+    body.app-active .kpi-value { font-size:1.7rem; }
+    body.app-active .feedback-bar { display:none; }
+    body.app-active .dashboard-grid { grid-template-columns:380px minmax(0,1fr); align-items:start; margin-top:16px; }
+    body.app-active .glass-card {
+      position:relative; border-radius:18px; border-color:rgba(255,255,255,.075);
+      background:#111214; box-shadow:0 18px 60px rgba(0,0,0,.18);
+    }
+    body.app-active .glass-card:first-child {
+      position:sticky; top:96px;
+      min-height:calc(100vh - 118px);
+    }
+    body.app-active .card-title { font-size:1.2rem; }
+    body.app-active .card-subtitle { max-width:300px; }
+    body.app-active .preset-container {
+      margin:20px 0 22px; padding:14px; border-radius:12px;
+      border:1px solid var(--soft-line); background:#0c0d0e;
+    }
+    body.app-active .preset-container label { color:#777980; font-size:.66rem; }
+    body.app-active .chip {
+      min-height:34px; border-radius:999px; font-size:.68rem; padding:7px 10px; text-align:left;
+    }
+    body.app-active .chips { display:grid; grid-template-columns:1fr 1fr; }
+    body.app-active .form-row { grid-template-columns:1fr 1fr !important; }
+    body.app-active .form-row .form-group:last-child { grid-column:span 2; }
+    body.app-active textarea { height:110px; }
+    body.app-active .pipeline-status-card { margin-top:16px; }
+    body.app-active .pipeline-status-card > div:first-child strong { font-size:.78rem !important; }
+    body.app-active .pipeline-steps { display:grid; grid-template-columns:1fr 1fr; }
+    body.app-active .step-item { font-size:.67rem; border-right:1px solid var(--soft-line); }
+    body.app-active .gallery-header {
+      top:-24px; margin:-24px -24px 18px; padding:20px 24px;
+      border-radius:18px 18px 0 0; background:#111214;
+    }
+    body.app-active .video-grid { grid-template-columns:repeat(3,minmax(0,1fr)); }
+    body.app-active .empty-state { grid-column:1/-1; min-height:390px; display:grid; place-items:center; text-align:center; }
+    body.app-active .gallery-empty {
+      position:relative; overflow:hidden; border-style:solid; border-color:rgba(255,255,255,.07);
+      background:radial-gradient(circle at 50% 30%,rgba(186,255,41,.09),transparent 28%),#0d0e10;
+    }
+    body.app-active .gallery-empty::before {
+      content:""; width:170px; height:220px; margin-bottom:-150px;
+      border:1px solid rgba(255,255,255,.11); border-radius:12px;
+      background:linear-gradient(155deg,#252724,#111214 58%,#34372f);
+      box-shadow:0 26px 70px rgba(0,0,0,.45);
+      transform:rotate(8deg);
+    }
+    body.app-active .gallery-empty strong { color:white; font-size:1.15rem; }
+    body.app-active .gallery-empty span { display:block; max-width:290px; margin:8px auto 0; color:#777980; font-size:.78rem; line-height:1.7; }
+
+    /* Desktop-style production workspace */
+    .studio-sidebar { display:none; }
+    body.app-active .studio-sidebar {
+      display:flex; position:fixed; z-index:20; left:0; top:0; bottom:0; width:208px;
+      flex-direction:column; padding:20px 14px; border-right:1px solid rgba(255,255,255,.07);
+      background:#090a0b;
+    }
+    body.app-active .studio-sidebar .studio-logo {
+      height:54px; display:flex; align-items:center; gap:10px; padding:0 8px;
+      font-weight:800; letter-spacing:-.02em;
+    }
+    body.app-active .studio-logo-mark {
+      width:29px; height:29px; border-radius:9px; display:grid; place-items:center;
+      background:var(--lime); color:#080908;
+    }
+    body.app-active .studio-nav-label { margin:25px 10px 8px; color:#5e6065; font-size:.58rem; letter-spacing:.14em; }
+    body.app-active .studio-nav-item {
+      width:100%; height:42px; display:flex; align-items:center; gap:11px; padding:0 12px;
+      border:0; border-radius:8px; background:none; color:#85878d; font-size:.76rem; text-align:left;
+    }
+    body.app-active .studio-nav-item.active { background:#1b1d1a; color:white; }
+    body.app-active .studio-nav-item.active::before { content:""; width:3px; height:16px; margin-left:-12px; border-radius:3px; background:var(--lime); }
+    body.app-active .studio-sidebar-footer { margin-top:auto; border-top:1px solid rgba(255,255,255,.07); padding-top:14px; }
+    body.app-active .studio-project-plan { margin:12px 8px; }
+    body.app-active .studio-project-plan span { color:#777980; font-size:.65rem; }
+    body.app-active .studio-project-plan strong { display:block; margin-top:4px; font-size:.77rem; }
+    body.app-active .container { max-width:none; margin-left:208px; padding-left:24px; padding-right:24px; }
+    body.app-active header { margin:0 -24px; padding:14px 24px; height:70px; }
+    body.app-active header .brand-text p { display:none; }
+    body.app-active .studio-intro { height:94px; align-items:center; }
+    body.app-active .studio-intro h2 { font-size:1.55rem; }
+    body.app-active .studio-intro p { display:none; }
+    body.app-active .kpi-grid { display:grid; grid-template-columns:repeat(4,1fr); }
+    body.app-active .kpi-grid .kpi-card { min-height:72px; padding:12px 14px; }
+    body.app-active .kpi-grid .kpi-card:last-child { display:none; }
+    body.app-active .dashboard-grid { grid-template-columns:320px minmax(560px,1fr); gap:12px; }
+    body.app-active .glass-card:first-child { top:82px; height:calc(100vh - 94px); min-height:650px; overflow-y:auto; }
+    body.app-active .glass-card:last-child { min-height:650px; background:#0d0e0f; overflow:hidden; }
+    body.app-active .card-title { font-size:1rem; }
+    body.app-active .card-subtitle { font-size:.72rem; line-height:1.55; }
+    body.app-active .preset-container { padding:10px; }
+    body.app-active .chips { grid-template-columns:1fr; }
+    body.app-active .chip { border-radius:6px; min-height:31px; }
+    body.app-active .studio-preview {
+      height:min(390px,43vh); min-height:260px; display:grid; place-items:center;
+      margin:18px 24px 0; border-radius:10px 10px 0 0;
+      border:1px solid rgba(255,255,255,.08); border-bottom:0;
+      background-color:#151619;
+      background-image:linear-gradient(rgba(255,255,255,.025) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.025) 1px,transparent 1px);
+      background-size:24px 24px;
+    }
+    body.app-active .studio-preview-frame {
+      position:relative; width:190px; height:338px; max-height:92%; border-radius:7px; overflow:hidden;
+      background:linear-gradient(145deg,#0a0d10,#3a443f 48%,#b6be9d 49%,#1c201d 72%);
+      box-shadow:0 24px 70px rgba(0,0,0,.65);
+    }
+    body.app-active .studio-preview-frame::before {
+      content:"YOUR NEXT\\A VIRAL STORY"; white-space:pre; position:absolute; left:18px; right:18px; top:54px;
+      font-size:1.15rem; font-weight:800; line-height:.92; letter-spacing:-.06em;
+    }
+    body.app-active .studio-preview-frame::after {
+      content:"CREATE  /  EDIT  /  PUBLISH"; position:absolute; left:18px; bottom:18px;
+      color:var(--lime); font-family:'JetBrains Mono',monospace; font-size:.48rem; letter-spacing:.08em;
+    }
+    body.app-active .studio-timeline {
+      height:160px; margin:0 24px; border:1px solid rgba(255,255,255,.08);
+      border-radius:0 0 10px 10px; background:#111214; padding:12px;
+    }
+    body.app-active .studio-timeline-head { display:flex; justify-content:flex-end; gap:8px; height:24px; }
+    body.app-active .studio-timeline-head span { width:7px; height:7px; border-radius:50%; background:#5f6266; }
+    body.app-active .studio-track {
+      height:45px; margin-top:10px; border-radius:5px; overflow:hidden; display:flex;
+      background:linear-gradient(90deg,#24332d 0 28%,#303d38 28% 56%,#1d2521 56% 100%);
+    }
+    body.app-active .studio-track::before { content:"AI VISUAL 01       AI VISUAL 02       AI VISUAL 03"; align-self:end; padding:8px; color:#9ba39f; font-size:.48rem; white-space:nowrap; }
+    body.app-active .studio-track.voice { height:25px; background:#443d24; }
+    body.app-active .studio-track.voice::before { content:"Voiceover"; }
+    body.app-active .gallery-header { display:none; }
+    body.app-active .video-grid { grid-template-columns:repeat(2,minmax(0,1fr)); padding:16px 24px 24px; }
+    body.app-active .video-player-wrapper { height:220px; }
+
+    .showcase-image {
+      isolation:isolate;
+      box-shadow:inset 0 0 0 1px rgba(255,255,255,.08), 0 30px 80px rgba(0,0,0,.25);
+    }
+    .showcase-image::before {
+      content:""; position:absolute; left:15%; top:8%; width:70%; height:56%;
+      border-radius:50%; border:1px solid rgba(255,255,255,.28);
+      background:radial-gradient(circle,rgba(255,255,255,.2),transparent 58%);
+      transform:rotate(-12deg); filter:blur(.2px);
+    }
+    .showcase-image::after {
+      position:absolute; left:18px; right:18px; top:50%; color:white;
+      font-size:clamp(1.6rem,3vw,3rem); font-weight:800; line-height:.85;
+      letter-spacing:-.06em; text-shadow:0 3px 18px rgba(0,0,0,.45);
+    }
+    .showcase-one { background:radial-gradient(circle at 70% 20%,rgba(186,255,41,.55),transparent 3%),linear-gradient(145deg,#171b19,#8c583b 50%,#d59a57); }
+    .showcase-one::after { content:"MAKE IT\A ICONIC"; white-space:pre; }
+    .showcase-two { background:radial-gradient(circle at 25% 35%,rgba(255,218,176,.7),transparent 4%),linear-gradient(145deg,#b8c0bd,#344d4e 48%,#111718); }
+    .showcase-two::after { content:"STORIES\A MOVE"; white-space:pre; }
+    .showcase-three { background:radial-gradient(circle at 70% 30%,#dfc86b,transparent 7%),linear-gradient(145deg,#6d705e,#292d28 55%,#b38b5b); }
+    .showcase-three::after { content:"KEEP IT\A REAL"; white-space:pre; }
+    .showcase-image button { z-index:2; }
+    .showcase-preview-modal {
+      position:fixed; inset:0; z-index:10000; display:none; place-items:center;
+      padding:24px; background:rgba(0,0,0,.88); backdrop-filter:blur(18px);
+    }
+    .showcase-preview-modal.open { display:grid; }
+    .showcase-preview-dialog {
+      position:relative; width:min(1040px,94vw); border:1px solid rgba(255,255,255,.12);
+      border-radius:18px; overflow:hidden; background:#080909; box-shadow:0 40px 120px rgba(0,0,0,.7);
+    }
+    .showcase-preview-top {
+      height:58px; display:flex; align-items:center; justify-content:space-between;
+      padding:0 18px 0 22px; border-bottom:1px solid rgba(255,255,255,.08);
+    }
+    .showcase-preview-top strong { font-size:.86rem; letter-spacing:.02em; }
+    .showcase-preview-close {
+      width:34px; height:34px; border:1px solid rgba(255,255,255,.12); border-radius:50%;
+      background:#151616; color:white; cursor:pointer;
+    }
+    .showcase-preview-video { width:100%; max-height:72vh; display:block; background:#000; aspect-ratio:16/9; object-fit:contain; }
+    .showcase-image video, .reel-video {
+      width:100%; height:100%; object-fit:cover; display:block;
+    }
+    .showcase-image::before { display:none; }
+    .showcase-image::after { content:none !important; }
+    .showcase-image video { opacity:.82; transition:transform .8s ease, opacity .35s ease; }
+    article:hover .showcase-image video { transform:scale(1.025); opacity:1; }
+    .reel-main::after { content:""; position:absolute; inset:auto 0 0; height:42%; background:linear-gradient(transparent,rgba(0,0,0,.85)); }
+
+    @media(max-width:900px) {
+      body.app-active .dashboard-grid { grid-template-columns:1fr; }
+      body.app-active .kpi-grid { grid-template-columns:repeat(5,160px); overflow-x:auto; }
+      body.app-active .glass-card:first-child { position:static; min-height:0; }
+      body.app-active .video-grid { grid-template-columns:repeat(2,minmax(0,1fr)); }
+    }
+    @media(max-width:640px) {
+      body.app-active .container, body.app-active header { padding-left:16px; padding-right:16px; }
+      body.app-active header { margin-left:-16px; margin-right:-16px; }
+      body.app-active .studio-intro { align-items:flex-start; }
+      body.app-active .studio-intro p { display:none; }
+      body.app-active .studio-intro h2 { font-size:1.65rem; }
+      body.app-active .dashboard-grid { grid-template-columns:1fr; }
+      body.app-active .form-row { grid-template-columns:1fr !important; }
+      body.app-active .form-row .form-group:last-child { grid-column:auto; }
+      body.app-active .pipeline-steps { grid-template-columns:1fr; }
+      body.app-active .video-grid { grid-template-columns:1fr; }
+      .showcase-one::after,.showcase-two::after,.showcase-three::after { font-size:3rem; }
+    }
+
+    @media(max-width:900px) {
+      body.app-active .studio-sidebar { display:none; }
+      body.app-active .container { margin-left:0; }
+      body.app-active .dashboard-grid { grid-template-columns:1fr; }
+      body.app-active .glass-card:first-child { height:auto; min-height:0; }
+      body.app-active .studio-preview { height:360px; margin-left:12px; margin-right:12px; }
+      body.app-active .studio-timeline { margin-left:12px; margin-right:12px; }
+    }
+
+    /* Original purple dashboard theme. */
+    body.app-active {
+      --accent: #ec4899;
+      --primary: #6366f1;
+      --primary-glow: rgba(99, 102, 241, 0.35);
+      --accent-glow: rgba(236, 72, 153, 0.35);
+      --card-bg: rgba(20, 18, 31, 0.92);
+      --card-border: rgba(139, 92, 246, 0.18);
+      background:
+        radial-gradient(circle at 14% 8%, rgba(99, 102, 241, 0.16), transparent 26rem),
+        radial-gradient(circle at 88% 18%, rgba(236, 72, 153, 0.09), transparent 24rem),
+        #09090f;
+    }
+    body.app-active header { min-height:auto; }
+    body.app-active .container { max-width:1180px; margin:0 auto; padding-top:26px; }
+    body.app-active .studio-sidebar,
+    body.app-active .studio-preview,
+    body.app-active .studio-timeline,
+    body.app-active .studio-intro { display:none !important; }
+    body.app-active .dashboard-grid {
+      grid-template-columns:minmax(320px, 410px) minmax(0, 1fr) !important;
+      gap:18px;
+      margin:18px 0 40px;
+    }
+    body.app-active .glass-card:first-child,
+    body.app-active .glass-card:last-child {
+      position:static;
+      height:auto;
+      min-height:0;
+      overflow:visible;
+      background:linear-gradient(145deg, rgba(20,18,31,.96), rgba(13,12,22,.96));
+      border-color:rgba(139,92,246,.22);
+      box-shadow:0 24px 70px rgba(0,0,0,.32), inset 0 1px rgba(255,255,255,.025);
+    }
+    body.app-active .card-title { color:#f3f3f3; }
+    body.app-active .card-subtitle { color:#8d8d8d; }
+    body.app-active .gallery-header { display:flex; }
+    body.app-active .video-grid {
+      grid-template-columns:repeat(2,minmax(0,1fr));
+      padding:0;
+      gap:14px;
+    }
+    body.app-active .video-player-wrapper { height:auto; aspect-ratio:9/16; max-height:420px; }
+    body.app-active .btn-generate,
+    body.app-active .refresh-btn,
+    body.app-active .btn-download {
+      background:linear-gradient(135deg,#6366f1,#ec4899);
+      color:#fff;
+      border-color:transparent;
+      box-shadow:0 10px 28px rgba(99,102,241,.25);
+    }
+    body.app-active input,
+    body.app-active textarea,
+    body.app-active select { border-color:rgba(139,92,246,.18); }
+    body.app-active input:focus,
+    body.app-active textarea:focus,
+    body.app-active select:focus { border-color:#8b5cf6; box-shadow:0 0 0 3px rgba(139,92,246,.16); }
+
+    /* Restore the original dashboard header and KPI area. */
+    body.app-active header {
+      margin: 0 0 28px;
+      padding: 0 0 18px;
+      height: auto;
+      min-height: auto;
+      border-bottom: 1px solid rgba(139,92,246,.18);
+    }
+    body.app-active[data-role="admin"] .header-actions a[data-admin-only],
+    body.app-active[data-role="admin"] .header-actions button[data-admin-only]:not(:last-of-type) {
+      width:auto;
+      min-width:0;
+      height:auto;
+      overflow:visible;
+      justify-content:center;
+      padding:8px 16px;
+      font-size:.82rem;
+    }
+    body.app-active .header-actions .btn-settings,
+    body.app-active .header-actions a.btn-settings {
+      border-radius:10px;
+    }
+    body.app-active[data-role="admin"] .header-actions a[data-admin-only]::first-letter,
+    body.app-active[data-role="admin"] .header-actions button[data-admin-only]:not(:last-of-type)::first-letter { font-size:inherit; }
+    body.app-active header .brand-text p { display:block; }
+    body.app-active .studio-intro { display:none !important; }
+    body.app-active .kpi-grid {
+      grid-template-columns:repeat(4,minmax(0,1fr)) !important;
+      gap:14px !important;
+      margin:0 0 22px;
+      width:100%;
+    }
+    body.app-active .kpi-grid .kpi-card:last-child { display:flex !important; }
+    body.app-active .kpi-card {
+      min-height:98px !important;
+      height:auto !important;
+      border-radius:16px !important;
+      border:1px solid rgba(139,92,246,.16) !important;
+      border-top:1px solid rgba(139,92,246,.16) !important;
+      align-items:center !important;
+      justify-content:center !important;
+      text-align:center;
+      padding:18px !important;
+      background:linear-gradient(145deg,rgba(20,18,31,.96),rgba(13,12,22,.96)) !important;
+    }
+    body.app-active .kpi-card::before,
+    body.app-active .kpi-card::after { display:none !important; }
+    body.app-active .kpi-label {
+      color:#9a9aab !important;
+      font-size:.68rem !important;
+      text-transform:none;
+      letter-spacing:.04em;
+    }
+    body.app-active .kpi-value {
+      color:#fff !important;
+      font-size:1.7rem !important;
+    }
+    body.app-active .feedback-bar,
+    body.app-active .kpi-card[data-kpi="csat"] { display:none !important; }
+
+    /* Restore the original gallery panel without editor preview/timeline chrome. */
+    body.app-active .studio-preview,
+    body.app-active .studio-timeline { display:none !important; }
+    body.app-active .gallery-header {
+      position:static;
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      margin:0 0 18px;
+      padding:0 0 18px;
+      top:auto;
+      border-radius:0;
+      border-bottom:1px solid rgba(139,92,246,.16);
+      background:transparent;
+    }
+    body.app-active .video-grid {
+      grid-template-columns:repeat(auto-fill,minmax(190px,1fr)) !important;
+      padding:0 !important;
+      gap:14px !important;
+    }
+    body.app-active .video-card {
+      border-radius:14px;
+      border-color:rgba(139,92,246,.16);
+      background:rgba(10,9,17,.88);
+    }
+    body.app-active .gallery-empty {
+      background:rgba(14,13,23,.82) !important;
+      border:1px dashed rgba(139,92,246,.22) !important;
+    }
+    body.app-active .gallery-empty::before { display:none !important; }
+    body.app-active .pipeline-status-card {
+      background:linear-gradient(145deg,rgba(22,20,34,.98),rgba(12,11,20,.98)) !important;
+      border:1px solid rgba(139,92,246,.22) !important;
+      border-left:3px solid #8b5cf6 !important;
+      border-radius:14px !important;
+      box-shadow:inset 0 1px rgba(255,255,255,.025);
+    }
+    body.app-active .pipeline-status-card > div:first-child strong {
+      color:#f5f3ff !important;
+      font-family:inherit !important;
+    }
+    body.app-active .pipeline-steps { gap:8px !important; }
+    body.app-active .step-item {
+      min-height:58px;
+      align-items:center;
+      border:1px solid rgba(139,92,246,.1) !important;
+      border-right:1px solid rgba(139,92,246,.1) !important;
+      border-bottom:1px solid rgba(139,92,246,.1) !important;
+      border-radius:10px;
+      background:rgba(255,255,255,.018) !important;
+      color:#9695a6 !important;
+      font-family:inherit !important;
+    }
+    body.app-active .step-item.active,
+    body.app-active .step-item.complete {
+      border-color:rgba(139,92,246,.32) !important;
+      background:linear-gradient(135deg,rgba(99,102,241,.13),rgba(236,72,153,.07)) !important;
+      color:#f3f0ff !important;
+    }
+    body.app-active .step-icon {
+      border:1px solid rgba(139,92,246,.4) !important;
+      background:#171424 !important;
+      color:#c4b5fd !important;
+    }
+    body.app-active .step-item.complete .step-icon {
+      background:linear-gradient(135deg,#6366f1,#ec4899) !important;
+      border-color:transparent !important;
+      color:white !important;
+    }
+    body.app-active .badge-status {
+      border:1px solid rgba(139,92,246,.25);
+      border-radius:999px;
+      background:rgba(139,92,246,.12);
+      color:#d8d1ff;
+    }
+    body.app-active .gallery-empty,
+    body.app-active .empty-state {
+      min-height:280px;
+      border-radius:14px !important;
+      border:1px dashed rgba(139,92,246,.22) !important;
+      background:linear-gradient(145deg,rgba(19,17,31,.92),rgba(12,11,20,.92)) !important;
+      color:#9a99aa;
+    }
+    body.app-active .gallery-empty strong,
+    body.app-active .empty-state strong { color:#f2efff !important; }
+    body.app-active .select-video,
+    body.app-active input[type="checkbox"].select-video {
+      width:20px;
+      height:20px;
+      accent-color:#8b5cf6;
+      border-radius:5px;
+    }
+    body.app-active .video-details {
+      background:#11101a !important;
+      border-top:1px solid rgba(139,92,246,.14);
+      color:#f4f2fa;
+    }
+    body.app-active .video-topic,
+    body.app-active .video-meta {
+      color:#c9c6d8 !important;
+    }
+    body.app-active .video-topic {
+      color:#f7f5ff !important;
+    }
+    body.app-active .video-status,
+    body.app-active .video-meta span {
+      border:1px solid rgba(139,92,246,.18);
+      background:rgba(139,92,246,.09);
+      color:#aaa5bc !important;
+    }
+    body.app-active .btn-download {
+      border-radius:8px !important;
+      border:1px solid rgba(139,92,246,.28) !important;
+      background:linear-gradient(135deg,#6366f1,#8b5cf6) !important;
+      color:#fff !important;
+      box-shadow:0 8px 20px rgba(99,102,241,.18);
+    }
+    @media(max-width:900px) {
+      body.app-active .container { margin-left:0; }
+      body.app-active .dashboard-grid { grid-template-columns:minmax(280px, 360px) minmax(0, 1fr) !important; }
+      body.app-active .video-grid { grid-template-columns:repeat(2,minmax(0,1fr)); }
+    }
+  </style>
+</head>
+<body>
+  <div id="marketingPage" class="marketing-page">
+    <nav class="marketing-nav" aria-label="Ana navigasyon">
+      <a class="marketing-brand" href="/" aria-label="ViralBrandEngine ana sayfa">
+        <span class="marketing-mark" aria-hidden="true"></span>
+        ViralBrandEngine
+      </a>
+      <div class="marketing-links">
+        <a href="#features">Yetenekler</a>
+        <a href="#examples">Örnekler</a>
+        <a href="#about">Hakkımızda</a>
+      </div>
+      <button class="marketing-login" type="button" onclick="openAuth()">Giriş Yap</button>
+    </nav>
+
+    <main>
+      <section class="marketing-hero">
+        <div class="marketing-copy">
+          <span class="eyebrow">AI VIDEO PRODUCTION STUDIO</span>
+          <h1>Bir fikri,<br>iz bırakan videoya dönüştürün.</h1>
+          <p>Metin, ses, görsel ve senaryo tek bir akışta buluşsun. Markanız için sosyal medyada hazır, sinematik kısa videolar üretin.</p>
+          <div class="marketing-actions">
+            <button class="marketing-primary" type="button" onclick="openAuth()">İlk Videonu Oluştur <span aria-hidden="true">↗</span></button>
+            <a class="marketing-secondary" href="#examples">Örnekleri İzle</a>
+          </div>
+          <div class="marketing-proof">
+            <strong>09:16</strong><span>Dikey format</span>
+            <strong>4K</strong><span>Yüksek çözünürlük</span>
+            <strong>1 akış</strong><span>Başından sona üretim</span>
+          </div>
+        </div>
+        <div class="marketing-reel" aria-label="Örnek video çalışmaları">
+          <div class="reel-frame reel-main">
+            <video class="reel-video" src="/media/showcase/brand-story.mp4" muted autoplay loop playsinline></video>
+            <div class="reel-glow"></div>
+            <span class="reel-label">FEATURE FILM / 01</span>
+            <div class="reel-title">CREATE<br>THE<br>UNEXPECTED</div>
+            <button class="reel-play" type="button" aria-label="Örnek videoyu oynat" onclick="openShowcasePreview('/media/showcase/brand-story.mp4','Sinematik marka hikayesi')">▶</button>
+          </div>
+          <div class="reel-stack">
+            <div class="reel-frame reel-small reel-one"><span>PRODUCT / 02</span></div>
+            <div class="reel-frame reel-small reel-two"><span>STORY / 03</span></div>
+          </div>
+        </div>
+      </section>
+
+      <section id="examples" class="showcase-section">
+        <div class="section-heading">
+          <span>SEÇİLMİŞ ÇALIŞMALAR</span>
+          <h2>Her karede yeni bir hikaye.</h2>
+        </div>
+        <div class="showcase-grid">
+          <article><div class="showcase-image showcase-one"><video src="/media/showcase/product-launch.mp4" muted autoplay loop playsinline></video><button aria-label="Ürün lansmanı örneğini oynat" onclick="openShowcasePreview('/media/showcase/product-launch.mp4','Ürün lansmanı')">▶</button></div><h3>Ürün Lansmanı</h3><p>Ürün odaklı · Premium · 15 sn</p></article>
+          <article><div class="showcase-image showcase-two"><video src="/media/showcase/brand-story.mp4" muted autoplay loop playsinline></video><button aria-label="Marka hikayesi örneğini oynat" onclick="openShowcasePreview('/media/showcase/brand-story.mp4','Marka hikayesi')">▶</button></div><h3>Marka Hikayesi</h3><p>Sinematik · Duygusal · 30 sn</p></article>
+          <article><div class="showcase-image showcase-three"><video src="/media/showcase/social-content.mp4" muted autoplay loop playsinline></video><button aria-label="Sosyal içerik örneğini oynat" onclick="openShowcasePreview('/media/showcase/social-content.mp4','Sosyal içerik')">▶</button></div><h3>Sosyal İçerik</h3><p>Trend odaklı · Enerjik · 10 sn</p></article>
+        </div>
+      </section>
+
+      <section id="features" class="feature-strip">
+        <article><span>01</span><h3>Metinden sahneye</h3><p>Konunuzu yazın; senaryo, görsel ritim ve anlatım tek akışta kurulsun.</p></article>
+        <article><span>02</span><h3>Doğal seslendirme</h3><p>İçeriğin diline uygun ses, tempo ve ton seçimiyle anlatımı tamamlayın.</p></article>
+        <article><span>03</span><h3>Yayınlanmaya hazır</h3><p>Dikey, kısa ve sosyal platformlara uygun biçimde hazırlanan sonucu indirin.</p></article>
+      </section>
+
+      <section id="about" class="about-section">
+        <span>HAKKIMIZDA</span>
+        <h2>İyi fikirler beklemek değil, üretmek için var.</h2>
+        <p>ViralBrandEngine; içerik ekiplerini senaryodan final kareye kadar tek çalışma alanında buluşturan yapay zekâ destekli bir video üretim stüdyosudur.</p>
+      </section>
+    </main>
+  </div>
+
+  <div id="loginOverlay" class="login-overlay">
+    <form class="login-card" onsubmit="handleLogin(event)">
+      <h2>ViralBrandEngine Oturumu</h2>
+      <p>Kayıtlı kullanıcı hesabınızla giriş yapın veya yeni hesap oluşturun.</p>
+      <div class="form-row" style="margin-bottom:18px">
+        <button type="button" class="btn-settings" onclick="showAuthMode('login')">Giriş Yap</button>
+        <button type="button" class="btn-settings" onclick="showAuthMode('register')">Kayıt Ol</button>
+      </div>
+      <div class="form-group register-field" hidden>
+        <label for="registerName">Ad Soyad</label>
+        <input id="registerName" autocomplete="name">
+      </div>
+      <div class="form-group">
+        <label for="loginUsername">E-posta adresi</label>
+        <input id="loginUsername" type="email" autocomplete="username" required>
+      </div>
+      <div class="form-group">
+        <label for="loginPassword">Şifre</label>
+        <input id="loginPassword" type="password" autocomplete="current-password" required>
+      </div>
+      <div class="form-group register-field" hidden>
+        <label for="verificationCode">E-posta doğrulama kodu</label>
+        <input id="verificationCode" maxlength="6" inputmode="numeric">
+      </div>
+      <button id="authSubmitButton" class="btn-generate" type="submit">Giriş Yap</button>
+      <div id="loginError" class="login-error"></div>
+      <div id="authSuccessOverlay" class="auth-success-overlay">
+        <div class="auth-success-check">✓</div>
+        <div id="authSuccessText">İşlem başarılı</div>
+      </div>
+    </form>
+  </div>
+
+  <div class="container">
+    <!-- Header -->
+    <header>
+      <div class="brand">
+        <div class="logo-icon">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <polygon points="5 3 19 12 5 21 5 3"></polygon>
+          </svg>
+        </div>
+        <div class="brand-text">
+          <h1>ViralBrandEngine</h1>
+          <p>Autonomous AI B-Roll & Social Video Studio</p>
+        </div>
+      </div>
+      <div class="header-actions">
+        <a data-admin-only href="/docs" target="_blank" class="btn-settings" style="background: rgba(16, 185, 129, 0.15); border-color: rgba(16, 185, 129, 0.35); color: #6ee7b7; text-decoration: none;">
+          ⚡ Swagger Docs
+        </a>
+        <a data-admin-only href="/api/v1/analytics/videos" target="_blank" class="btn-settings" style="background: rgba(236, 72, 153, 0.15); border-color: rgba(236, 72, 153, 0.35); color: #f472b6; text-decoration: none;">
+          🎬 Video Linkleri (JSON)
+        </a>
+        <a data-admin-only href="/api/v1/analytics/export" target="_blank" class="btn-settings" style="background: rgba(6, 182, 212, 0.15); border-color: rgba(6, 182, 212, 0.35); color: #67e8f9; text-decoration: none;">
+          📊 Tam Veri Seti (JSON)
+        </a>
+        <button data-admin-only type="button" class="btn-settings" onclick="downloadReport('pdf')">⬇️ PDF Rapor</button>
+        <button data-admin-only type="button" class="btn-settings" onclick="downloadReport('excel')">⬇️ Excel Rapor</button>
+        <div id="badgeOpenAI" class="api-badge">🤖 OpenAI: Yerel</div>
+        <div id="badgeEleven" class="api-badge">🎙️ ElevenLabs: SAPI5 TTS</div>
+        <div id="badgeStock" class="api-badge">🎥 Stok Video: Yerel</div>
+        <button data-admin-only class="btn-settings" onclick="openApiModal()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="3"></circle>
+            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+          </svg>
+          API Anahtarları (Ayarlar)
+        </button>
+        <div id="currentRoleBadge" class="api-badge role-badge"></div>
+        <button type="button" class="btn-settings" onclick="logout()">Çıkış Yap</button>
+      </div>
+    </header>
+
+    <aside class="studio-sidebar" aria-label="Studio navigation">
+      <div class="studio-logo"><span class="studio-logo-mark">▶</span><span>VBE Studio</span></div>
+      <div class="studio-nav-label">WORKSPACE</div>
+      <button class="studio-nav-item active" type="button">⌂ <span>Stüdyo</span></button>
+      <button class="studio-nav-item" type="button">✦ <span>Yeni video</span></button>
+      <button class="studio-nav-item" type="button">▦ <span>Projelerim</span></button>
+      <button class="studio-nav-item" type="button">◫ <span>Medya kütüphanesi</span></button>
+      <div class="studio-nav-label">ACCOUNT</div>
+      <button class="studio-nav-item" type="button" onclick="openApiModal()">⚙ <span>Entegrasyonlar</span></button>
+      <div class="studio-sidebar-footer">
+        <div class="studio-project-plan"><span>CREATOR PLAN</span><strong>8 / 20 video</strong></div>
+      </div>
+    </aside>
+
+    <div class="studio-intro">
+      <div><span>ÇALIŞMA ALANI</span><h2>Yeni bir video oluştur</h2></div>
+      <p>Tüm projeleriniz bu oturumda senkronize edilir.</p>
+    </div>
+
+    <section class="kpi-grid" aria-label="Ürün KPI'ları">
+      <div class="kpi-card"><div class="kpi-label">NPS</div><div class="kpi-value" id="kpiNps">—</div></div>
+      <div class="kpi-card"><div class="kpi-label">Funnel Tamamlama</div><div class="kpi-value" id="kpiFunnel">—</div></div>
+      <div class="kpi-card"><div class="kpi-label">Video Başı Maliyet</div><div class="kpi-value" id="kpiCost">—</div></div>
+      <div class="kpi-card"><div class="kpi-label">Sosyal Görüntülenme</div><div class="kpi-value" id="kpiViews">—</div></div>
+    </section>
+
+    <!-- Main Grid -->
+    <div class="dashboard-grid">
+      
+      <!-- Generator Panel -->
+      <div class="glass-card">
+        <h2 class="card-title">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#6366f1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"></path>
+          </svg>
+          Yeni Video Oluştur
+        </h2>
+        <p class="card-subtitle">Konu ve tonu seçin; senaryo, seslendirme, B-roll ve 9:16 video otonom üretilsin.</p>
+
+        <!-- Preset Chips -->
+        <div class="preset-container">
+          <label>Popüler Konu Örnekleri</label>
+          <div class="chips">
+            <div class="chip" onclick="setTopic('3 Hidden AI Tools That Will Shock You in 2026')">🤖 3 Hidden AI Tools</div>
+            <div class="chip" onclick="setTopic('Why You Should Take Cold Showers Every Morning')">❄️ Cold Showers</div>
+            <div class="chip" onclick="setTopic('The 1% Rule That Changes Your Whole Life')">📈 The 1% Rule</div>
+            <div class="chip" onclick="setTopic('5 Money Mistakes Ruining Your 20s')">💰 5 Money Mistakes</div>
+          </div>
+        </div>
+
+        <form id="generateForm" onsubmit="handleGenerate(event)">
+          <div class="form-group">
+            <label for="topic">Video Konusu / Fikri</label>
+            <textarea id="topic" rows="3" placeholder="Örn: 5 Morning Habits of Self-Made Millionaires" required></textarea>
+          </div>
+
+          <div class="form-row" style="grid-template-columns: 1fr 1fr 1fr;">
+            <div class="form-group">
+              <label for="language">🗣️ Ses & Senaryo Dili</label>
+              <select id="language">
+                <option value="tr" selected>🇹🇷 Türkçe</option>
+                <option value="en">🇺🇸 English</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="tone">Marka / Anlatım Tonu</label>
+              <select id="tone">
+                <option value="motivational">🔥 Motivasyonel</option>
+                <option value="dramatic">⚡ Çarpıcı / Heyecanlı</option>
+                <option value="educational">🧠 Eğitici / Bilgilendirici</option>
+                <option value="humorous">😄 Eğlenceli / Samimi</option>
+                <option value="professional">💼 Profesyonel</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="duration">Hedef Süre</label>
+              <select id="duration">
+                <option value="10">10 saniye</option>
+                <option value="15" selected>15 saniye (Optimal)</option>
+                <option value="20">20 saniye</option>
+                <option value="30">30 saniye</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="subtitles">Video Altyazısı</label>
+            <select id="subtitles">
+              <option value="false" selected>Altyazısız (daha hızlı render)</option>
+              <option value="true">Altyazılı</option>
+            </select>
+          </div>
+
+          <button type="submit" id="btnSubmit" class="btn-generate">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <polygon points="5 3 19 12 5 21 5 3"></polygon>
+            </svg>
+            Otonom Video Üretimini Başlat
+          </button>
+        </form>
+
+        <!-- Pipeline Status Real-time Card -->
+        <div id="pipelineStatus" class="pipeline-status-card">
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <strong style="font-size: 0.95rem; color: #fff;">Canlı Boru Hattı Durumu</strong>
+            <span id="currentStatusBadge" class="badge-status badge-EDITING_VIDEO">İşlemde</span>
+          </div>
+
+          <div class="pipeline-steps">
+            <div class="step-item" id="step-script">
+              <div class="step-icon">1</div>
+              <span>GPT-4o ile Viral Hook & Senaryo Üretimi</span>
+            </div>
+            <div class="step-item" id="step-voice">
+              <div class="step-icon">2</div>
+              <span>ElevenLabs ile Yapay Zeka Seslendirmesi</span>
+            </div>
+            <div class="step-item" id="step-broll">
+              <div class="step-icon">3</div>
+              <span>Dinamik 9:16 B-Roll Kliplerinin Toplanması</span>
+            </div>
+            <div class="step-item" id="step-render">
+              <div class="step-icon">4</div>
+              <span>FFmpeg ile Hızlı Video Render</span>
+            </div>
+          </div>
+          <div id="pipelineError" class="pipeline-error" role="alert" hidden></div>
+        </div>
+
+      </div>
+
+      <!-- Video Feed & Gallery Panel -->
+      <div class="glass-card">
+        <div class="gallery-header">
+          <div>
+            <h2 class="card-title">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#ec4899" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="2" y="2" width="20" height="20" rx="2.18" ry="2.18"></rect>
+                <line x1="7" y1="2" x2="7" y2="22"></line>
+                <line x1="17" y1="2" x2="17" y2="22"></line>
+                <line x1="2" y1="12" x2="22" y2="12"></line>
+                <line x1="2" y1="7" x2="7" y2="7"></line>
+                <line x1="2" y1="17" x2="7" y2="17"></line>
+                <line x1="17" y1="17" x2="22" y2="17"></line>
+                <line x1="17" y1="7" x2="22" y2="7"></line>
+              </svg>
+              Üretilen Videolar Galerisi
+            </h2>
+            <p class="card-subtitle" style="margin-bottom: 0;">Tamamlanan dikey Reels / TikTok formatlı videolarınız.</p>
+          </div>
+          <div class="gallery-actions">
+            <button id="deleteSelectedBtn" class="delete-btn" onclick="deleteSelectedJobs()" disabled>Seçilenleri Sil (0)</button>
+            <button class="refresh-btn" onclick="fetchJobs()">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="23 4 23 10 17 10"></polyline>
+                <polyline points="1 20 1 14 7 14"></polyline>
+                <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>
+              </svg>
+              Yenile
+            </button>
+          </div>
+        </div>
+
+        <div class="studio-preview">
+          <div class="studio-preview-frame" aria-label="Video önizleme"></div>
+        </div>
+        <div class="studio-timeline" aria-label="Video zaman çizelgesi">
+          <div class="studio-timeline-head"><span></span><span></span><span></span></div>
+          <div class="studio-track"></div>
+          <div class="studio-track voice"></div>
+        </div>
+
+        <div id="videoGrid" class="video-grid">
+          <div class="empty-state gallery-empty"><div><strong>Projeleriniz hazırlanıyor...</strong><span>Video galerisini güncelliyoruz.</span></div></div>
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+
+  <div id="showcasePreviewModal" class="showcase-preview-modal" role="dialog" aria-modal="true" aria-labelledby="showcasePreviewTitle" onclick="closeShowcasePreview(event)">
+    <div class="showcase-preview-dialog" onclick="event.stopPropagation()">
+      <div class="showcase-preview-top">
+        <strong id="showcasePreviewTitle">Video önizleme</strong>
+        <button type="button" class="showcase-preview-close" aria-label="Önizlemeyi kapat" onclick="closeShowcasePreview()">×</button>
+      </div>
+      <video id="showcasePreviewVideo" class="showcase-preview-video" controls autoplay playsinline></video>
+    </div>
+  </div>
+
+  <!-- API Settings Modal -->
+  <div id="apiModal" class="modal-overlay">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3 class="modal-title">⚙️ API Anahtarları & Entegrasyonlar</h3>
+        <button class="btn-close" onclick="closeApiModal()">&times;</button>
+      </div>
+
+      <form onsubmit="handleSaveApiKeys(event)">
+        <!-- Pixabay (Free & Instant - Recommended) -->
+        <div class="form-group" style="border: 1px solid rgba(16, 185, 129, 0.4); border-radius: 12px; padding: 14px; background: rgba(16, 185, 129, 0.06);">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+            <label for="apiKeyPixabay" style="color: #34d399; margin-bottom: 0;">🎥 Pixabay API Key (ÖNERİLEN & ÜCRETSİZ ANINDA AKTİF)</label>
+            <span style="background: #10b981; color: #022c22; font-size: 0.68rem; font-weight: 700; padding: 2px 7px; border-radius: 4px;">10 SANİYEDE ALINIR</span>
+          </div>
+          <p class="api-desc" style="color: #a7f3d0;">
+            Pexels yeni API başvurusunu geçici durdurduğu için <strong>Pixabay Video API</strong> entegre edilmiştir. Google ile 1 tıkla üye olup anında ücretsiz anahtarınızı kopyalayabilirsiniz.
+            <br>
+            <a href="https://pixabay.com/api/docs/" target="_blank" style="color: #6ee7b7; font-weight: bold; text-decoration: underline;">👉 Pixabay API Docs sayfasına git (yeşil kutudan key'i kopyala) &rarr;</a>
+          </p>
+          <input type="text" id="apiKeyPixabay" placeholder="Örn: 49837261-71e8f8045f2be582...">
+        </div>
+
+        <!-- Pexels -->
+        <div class="form-group">
+          <label for="apiKeyPexels">🎥 Pexels API Key (Mevcut Hesabı Olanlar İçin)</label>
+          <p class="api-desc">
+            Pexels üzerinde daha önceden alınmış aktif API anahtarınız varsa buraya ekleyebilirsiniz.
+            <a href="https://www.pexels.com/api/" target="_blank">Pexels API &rarr;</a>
+          </p>
+          <input type="text" id="apiKeyPexels" placeholder="Örn: 563492ad6f91700001000001...">
+        </div>
+
+        <!-- OpenAI -->
+        <div class="form-group">
+          <label for="apiKeyOpenAI">🤖 OpenAI API Key (GPT-4o Senaryo & Kanca)</label>
+          <p class="api-desc">
+            Viral açılış kancaları, seslendirme metinleri ve SRT altyazılar üretir (Kredi bittiğinde Gemini veya akıllı şablon devreye girer).
+            <a href="https://platform.openai.com/api-keys" target="_blank">OpenAI API Key al &rarr;</a>
+          </p>
+          <input type="password" id="apiKeyOpenAI" placeholder="sk-proj-...">
+        </div>
+
+        <!-- Gemini API video generation -->
+        <div class="form-group" style="border: 1px solid rgba(236, 72, 153, 0.4); border-radius: 12px; padding: 14px; background: rgba(236, 72, 153, 0.06);">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+            <label for="apiKeyGoogleFlow" style="color: #f472b6; margin-bottom: 0;">🎬 Gemini AI Video API Key (Google Flow ayarı)</label>
+            <span style="background: #ec4899; color: #fff; font-size: 0.68rem; font-weight: 700; padding: 2px 7px; border-radius: 4px;">AI VİDEO</span>
+          </div>
+          <p class="api-desc" style="color: #fbcfe8;">
+            Google Flow'un ayrı bir genel API anahtarı yoktur. Google AI Studio'dan aldığınız <strong>Gemini API key</strong> ile sistem tüm storyboard'u tek bir devamlı video olarak üretir; AI üretimi başarısız olursa Pixabay'e sessizce dönmez.
+            <a href="https://aistudio.google.com/app/apikey" target="_blank" style="color: #fbcfe8; text-decoration: underline;">Gemini API key al &rarr;</a>
+          </p>
+          <input type="password" id="apiKeyGoogleFlow" placeholder="AIzaSy... (Gemini API key)">
+        </div>
+
+        <div class="form-group" style="border: 1px solid rgba(59, 130, 246, 0.4); border-radius: 12px; padding: 14px; background: rgba(59, 130, 246, 0.06);">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+            <label for="apiKeyKling" style="color: #93c5fd; margin-bottom: 0;">🎬 Kling AI API Key (AI Video)</label>
+            <span style="background: #2563eb; color: #fff; font-size: 0.68rem; font-weight: 700; padding: 2px 7px; border-radius: 4px;">ÖNCELİKLİ AI VİDEO</span>
+          </div>
+          <p class="api-desc" style="color: #dbeafe;">
+            Kling API key ayarlandığında diğer AI video sağlayıcılarından önce kullanılır. Kling 3.0 ile tek storyboard isteğinden 9:16, 720p, 10 saniyelik video üretir. API kredisi/erişimi Kling Developer Platform hesabınıza bağlıdır.
+            <a href="https://app.klingai.com/global/dev" target="_blank" rel="noopener noreferrer" style="color: #dbeafe; text-decoration: underline;">Kling Open Platform &rarr;</a>
+          </p>
+          <input type="password" id="apiKeyKling" placeholder="api-key-kling-...">
+        </div>
+
+        <div class="form-group" style="border: 1px solid rgba(34, 197, 94, 0.4); border-radius: 12px; padding: 14px; background: rgba(34, 197, 94, 0.06);">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+            <label for="apiKeyLuma" style="color: #86efac; margin-bottom: 0;">🎬 Luma Ray 3.2 API Key (AI Video)</label>
+            <span style="background: #16a34a; color: #fff; font-size: 0.68rem; font-weight: 700; padding: 2px 7px; border-radius: 4px;">AI VİDEO</span>
+          </div>
+          <p class="api-desc" style="color: #dcfce7;">
+            Kling anahtarı yapılandırılmadıysa Luma Ray 3.2 kullanılır. 9:16, 720p, 10 saniyelik video üretir; daha uzun renderlarda görüntü döngüye alınabilir.
+            <a href="https://platform.lumalabs.ai/" target="_blank" rel="noopener noreferrer" style="color: #dcfce7; text-decoration: underline;">Luma API Platform &rarr;</a>
+          </p>
+          <input type="password" id="apiKeyLuma" placeholder="Luma API key">
+        </div>
+
+        <!-- Google Gemini & Flow / Veo (AI Script & Video) -->
+        <div class="form-group" style="border: 1px solid rgba(139, 92, 246, 0.4); border-radius: 12px; padding: 14px; background: rgba(139, 92, 246, 0.06);">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+            <label for="apiKeyGemini" style="color: #c4b5fd; margin-bottom: 0;">✨ Google Gemini API Key (Senaryo & AI Video)</label>
+            <span style="background: #8b5cf6; color: #fff; font-size: 0.68rem; font-weight: 700; padding: 2px 7px; border-radius: 4px;">SENARYO & AI VİDEO</span>
+          </div>
+          <p class="api-desc" style="color: #ddd6fe;">
+            Google AI Studio'dan alınan bu anahtar, <strong>senaryo üretimi</strong> ve Luma API anahtarı yapılandırılmamışsa <strong>tek parça, 9:16 AI video üretimi</strong> için kullanılır.
+            <br>
+            <a href="https://aistudio.google.com/app/apikey" target="_blank" style="color: #c4b5fd; font-weight: bold; text-decoration: underline;">👉 Google AI Studio'dan Ücretsiz API Key Al &rarr;</a>
+          </p>
+          <input type="password" id="apiKeyGemini" placeholder="AIzaSy...">
+        </div>
+
+        <!-- ElevenLabs -->
+        <div class="form-group">
+          <label for="apiKeyEleven">🎙️ ElevenLabs API Key (Ultra Gerçekçi Seslendirme)</label>
+          <p class="api-desc">
+            İnsan doğallığında profesyonel yapay zeka sesi üretir (Rachel, Adam vb.).
+            <a href="https://elevenlabs.io" target="_blank">ElevenLabs API Key al &rarr;</a>
+          </p>
+          <input type="password" id="apiKeyEleven" placeholder="sk_...">
+        </div>
+
+        <!-- Google Cloud TTS (Turkish Voice - Recommended) -->
+        <div class="form-group" style="border: 1px solid rgba(59, 130, 246, 0.4); border-radius: 12px; padding: 14px; background: rgba(59, 130, 246, 0.06);">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+            <label for="apiKeyGoogleTTS" style="color: #93c5fd; margin-bottom: 0;">🗣️ Google Cloud TTS Key (Türkçe Seslendirme - ÖNERİLEN)</label>
+            <span style="background: #3b82f6; color: #eff6ff; font-size: 0.68rem; font-weight: 700; padding: 2px 7px; border-radius: 4px;">GERÇEK TÜRKÇE SES</span>
+          </div>
+          <p class="api-desc" style="color: #bfdbfe;">
+            <strong>Türkçe WaveNet sesi</strong> için Google Cloud TTS kullanılır. Ayda 1 Milyon karakter ücretsizdir.
+            ElevenLabs key'iniz yoksa veya çalışmıyorsa, bu key ile gerçek Türkçe seslendirme alırsınız.<br>
+            <strong>Nasıl alınır:</strong> 1) <a href="https://console.cloud.google.com/apis/library/texttospeech.googleapis.com" target="_blank" style="color: #93c5fd;">Cloud TTS API'yi etkinleştir</a> → 2) 
+            <a href="https://console.cloud.google.com/apis/credentials" target="_blank" style="color: #93c5fd;">Credentials → API Key oluştur</a>
+          </p>
+          <input type="password" id="apiKeyGoogleTTS" placeholder="AIzaSy...">
+        </div>
+
+        <!-- Meta Instagram -->
+        <div class="form-group">
+          <label for="tokenMeta">📸 Meta Graph Token (Instagram Reels Auto-Post)</label>
+          <p class="api-desc">
+            Videoyu otomatik Instagram Reels olarak yayınlamak için (isteğe bağlı).
+            <a href="https://developers.facebook.com/" target="_blank">Meta Developer Console &rarr;</a>
+          </p>
+          <input type="password" id="tokenMeta" placeholder="EAAB...">
+        </div>
+
+        <button type="submit" id="btnSaveKeys" class="btn-generate" style="margin-top: 10px;">
+          💾 Anahtarları Kaydet ve Aktifleştir
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    function openShowcasePreview(src, title) {
+      const modal = document.getElementById('showcasePreviewModal');
+      const video = document.getElementById('showcasePreviewVideo');
+      document.getElementById('showcasePreviewTitle').textContent = title;
+      video.src = src;
+      modal.classList.add('open');
+      document.body.style.overflow = 'hidden';
+      video.play().catch(() => {});
+    }
+
+    function closeShowcasePreview(event) {
+      if (event && event.target !== event.currentTarget) return;
+      const modal = document.getElementById('showcasePreviewModal');
+      const video = document.getElementById('showcasePreviewVideo');
+      video.pause();
+      video.removeAttribute('src');
+      video.load();
+      modal.classList.remove('open');
+      document.body.style.overflow = '';
+    }
+
+    document.addEventListener('keydown', event => {
+      if (event.key === 'Escape') closeShowcasePreview();
+    });
+
+    let activeCampaignId = null;
+    let pollInterval = null;
+
+    const getApiKey = (admin = false) => {
+      const storageName = admin ? 'VBE_ADMIN_API_KEY' : 'VBE_API_KEY';
+      return localStorage.getItem(storageName)
+        || localStorage.getItem(admin ? 'VBE_API_KEY' : 'VBE_ADMIN_API_KEY')
+        || '';
+    };
+
+    const originalFetch = window.fetch.bind(window);
+    window.fetch = (url, options = {}) => {
+      const headers = new Headers(options.headers || {});
+      const path = String(url);
+      const isAdminEndpoint = path.includes('/api/v1/config/')
+        || path.includes('/api/v1/reports/')
+        || path.includes('/api/v1/analytics/')
+        || path.includes('/api/v1/analytics/export');
+      const key = headers.has('X-API-Key')
+        ? headers.get('X-API-Key')
+        : getApiKey(isAdminEndpoint);
+      if (key) headers.set('X-API-Key', key);
+      return originalFetch(url, { ...options, headers }).then(async response => {
+        if (
+          response.status === 401
+          && path.startsWith('/api/v1/')
+          && !path.includes('/auth/')
+        ) {
+          const responseBody = await response.clone().json().catch(() => ({}));
+          if (responseBody.detail === 'Invalid API key.') {
+            localStorage.removeItem('VBE_SESSION');
+            localStorage.removeItem('VBE_API_KEY');
+            localStorage.removeItem('VBE_ADMIN_API_KEY');
+            document.body.classList.remove('app-active');
+            window.setTimeout(openAuth, 0);
+          }
+        }
+        return response;
+      });
+    };
+
+    let authMode = 'login';
+
+    function showAuthMode(mode) {
+      authMode = mode;
+      document.querySelectorAll('.register-field').forEach((field) => {
+        field.hidden = mode === 'login';
+      });
+      document.getElementById('authSubmitButton').textContent =
+        mode === 'login' ? 'Giriş Yap' : (mode === 'register' ? 'Kayıt Ol ve Kod Gönder' : 'E-postayı Doğrula');
+      document.getElementById('loginError').textContent = '';
+      if (mode === 'verify') document.getElementById('verificationCode').focus();
+    }
+
+    async function handleLogin(event) {
+      event.preventDefault();
+      const error = document.getElementById('loginError');
+      const submitButton = document.getElementById('authSubmitButton');
+      error.textContent = '';
+      submitButton.disabled = true;
+      try {
+        if (authMode === 'register') {
+          setAuthLoading('Kod gönderiliyor...');
+          const email = document.getElementById('loginUsername').value.trim();
+          const response = await originalFetch('/api/v1/auth/register', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              display_name: document.getElementById('registerName').value.trim(),
+              email,
+              password: document.getElementById('loginPassword').value
+            })
+          });
+          const result = await response.json();
+          if (!response.ok) throw new Error(result.detail || 'Kayıt başarısız.');
+          authMode = 'verify';
+          showAuthMode('verify');
+          error.style.color = '#34d399';
+          error.textContent = `Kayıt başarılı. ${result.message}`;
+          return;
+        }
+        if (authMode === 'verify') {
+          setAuthLoading('Kod doğrulanıyor...');
+          const response = await originalFetch('/api/v1/auth/verify-email', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              email: document.getElementById('loginUsername').value.trim(),
+              code: document.getElementById('verificationCode').value.trim()
+            })
+          });
+          const result = await response.json();
+          if (!response.ok) throw new Error(result.detail || 'Doğrulama başarısız.');
+          authMode = 'login';
+          showAuthMode('login');
+          error.style.color = '#34d399';
+          error.textContent = 'Kayıt başarılı ve e-posta doğrulandı. Şimdi giriş yapabilirsiniz.';
+          return;
+        }
+        setAuthLoading('Giriş kontrol ediliyor...');
+        let response = await originalFetch('/api/v1/auth/user-login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            username: document.getElementById('loginUsername').value.trim(),
+            password: document.getElementById('loginPassword').value
+          })
+        });
+        if (!response.ok) {
+          response = await originalFetch('/api/v1/auth/login', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              username: document.getElementById('loginUsername').value.trim(),
+              password: document.getElementById('loginPassword').value
+            })
+          });
+        }
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.detail || 'Giriş başarısız.');
+        localStorage.setItem('VBE_SESSION', JSON.stringify({
+          username: data.username,
+          role: data.role,
+          display_name: data.display_name
+        }));
+        localStorage.setItem(data.role === 'admin' ? 'VBE_ADMIN_API_KEY' : 'VBE_API_KEY', data.api_key);
+        await showAuthSuccess('Giriş başarılı');
+        applySession();
+      } catch (err) {
+        error.textContent = err.message;
+      } finally {
+        clearAuthLoading();
+      }
+    }
+
+    function setAuthLoading(message) {
+      const submitButton = document.getElementById('authSubmitButton');
+      submitButton.disabled = true;
+      submitButton.innerHTML = `<span class="auth-spinner" aria-hidden="true"></span><span>${message}</span>`;
+    }
+
+    function clearAuthLoading() {
+      const submitButton = document.getElementById('authSubmitButton');
+      submitButton.disabled = false;
+      showAuthMode(authMode);
+    }
+
+    function showAuthSuccess(message) {
+      const overlay = document.getElementById('authSuccessOverlay');
+      document.getElementById('authSuccessText').textContent = message;
+      overlay.style.display = 'flex';
+      return new Promise(resolve => setTimeout(resolve, 900));
+    }
+
+    function applySession() {
+      let session = null;
+      try { session = JSON.parse(localStorage.getItem('VBE_SESSION')); } catch (_) {}
+      if (!session) {
+        document.body.classList.remove('app-active');
+        document.getElementById('loginOverlay').classList.remove('is-open');
+        return false;
+      }
+      document.body.dataset.role = session.role;
+      document.body.classList.add('app-active');
+      document.getElementById('loginOverlay').style.display = 'none';
+      document.getElementById('loginOverlay').classList.remove('is-open');
+      document.getElementById('currentRoleBadge').textContent = `${session.display_name} (${session.role})`;
+      return true;
+    }
+
+    function openAuth() {
+      document.getElementById('loginOverlay').classList.add('is-open');
+      document.getElementById('loginOverlay').style.display = '';
+      document.getElementById('loginUsername')?.focus();
+    }
+
+    function logout() {
+      localStorage.removeItem('VBE_SESSION');
+      localStorage.removeItem('VBE_API_KEY');
+      localStorage.removeItem('VBE_ADMIN_API_KEY');
+      document.body.removeAttribute('data-role');
+      document.body.classList.remove('app-active');
+      document.getElementById('loginOverlay').classList.remove('is-open');
+    }
+
+    async function downloadReport(format) {
+      const endpoint = format === 'pdf' ? '/api/v1/reports/pdf' : '/api/v1/reports/excel';
+      const response = await originalFetch(endpoint, {
+        headers: { 'X-API-Key': getApiKey(true) }
+      });
+      if (!response.ok) {
+        alert('Rapor indirilemedi. Yönetici oturumunu kontrol edin.');
+        return;
+      }
+      const blob = await response.blob();
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = format === 'pdf'
+        ? 'viral_brand_engine_raporu.pdf'
+        : 'viral_brand_engine_raporu.xlsx';
+      link.click();
+      URL.revokeObjectURL(url);
+    }
+
+    function setTopic(text) {
+      document.getElementById('topic').value = text;
+    }
+
+    function openApiModal() {
+      document.getElementById('apiModal').style.display = 'flex';
+    }
+
+    function closeApiModal() {
+      document.getElementById('apiModal').style.display = 'none';
+    }
+
+    // Load API Provider Status
+    async function checkApiStatus() {
+      try {
+        const res = await fetch('/api/v1/config/status');
+        const data = await res.json();
+        
+        const bOpenAI = document.getElementById('badgeOpenAI');
+        const bEleven = document.getElementById('badgeEleven');
+        const bStock = document.getElementById('badgeStock');
+
+        if (data.openai_configured) {
+          bOpenAI.className = 'api-badge active';
+          bOpenAI.innerHTML = '🤖 OpenAI: GPT-4o Aktif';
+        } else if (data.gemini_configured) {
+          bOpenAI.className = 'api-badge active';
+          bOpenAI.innerHTML = '✨ Gemini: AI Aktif';
+        } else {
+          bOpenAI.className = 'api-badge';
+          bOpenAI.innerHTML = '🤖 Senaryo: Akıllı Şablon';
+        }
+
+        if (data.google_tts_configured) {
+          bEleven.className = 'api-badge active';
+          bEleven.innerHTML = '🗣️ Google Cloud TTS: Aktif';
+        } else if (data.elevenlabs_configured) {
+          bEleven.className = 'api-badge active';
+          bEleven.innerHTML = '🎙️ ElevenLabs / gTTS: Aktif';
+        } else {
+          bEleven.className = 'api-badge active';
+          bEleven.innerHTML = '🎙️ Ses: gTTS Türkçe Aktif';
+        }
+
+        if (data.pixabay_configured || data.pexels_configured) {
+          bStock.className = 'api-badge active';
+          bStock.innerHTML = data.kling_configured
+            ? '🎬 AI Video: Kling'
+            : data.luma_configured
+            ? '🎬 AI Video: Luma Ray 3.2'
+            : `🎥 Stok: ${data.pixabay_configured ? 'Pixabay 9:16' : 'Pexels 9:16'}`;
+        } else if (data.kling_configured) {
+          bStock.className = 'api-badge active';
+          bStock.innerHTML = '🎬 AI Video: Kling';
+        } else if (data.luma_configured) {
+          bStock.className = 'api-badge active';
+          bStock.innerHTML = '🎬 AI Video: Luma Ray 3.2';
+        } else {
+          bStock.className = 'api-badge';
+          bStock.innerHTML = '🎥 Stok Video: Yerel B-Roll';
+        }
+      } catch (err) {
+        console.error('API status check error:', err);
+      }
+    }
+
+    // Save API keys
+    async function handleSaveApiKeys(e) {
+      e.preventDefault();
+      const btn = document.getElementById('btnSaveKeys');
+      btn.disabled = true;
+      btn.innerHTML = 'Kaydediliyor...';
+
+      const payload = {};
+      const pixabay = document.getElementById('apiKeyPixabay').value.trim();
+      const pexels = document.getElementById('apiKeyPexels').value.trim();
+      const openai = document.getElementById('apiKeyOpenAI').value.trim();
+      const gemini = document.getElementById('apiKeyGemini').value.trim();
+      const googleFlow = document.getElementById('apiKeyGoogleFlow') ? document.getElementById('apiKeyGoogleFlow').value.trim() : '';
+      const kling = document.getElementById('apiKeyKling').value.trim();
+      const luma = document.getElementById('apiKeyLuma').value.trim();
+      const eleven = document.getElementById('apiKeyEleven').value.trim();
+      const googleTts = document.getElementById('apiKeyGoogleTTS').value.trim();
+      const meta = document.getElementById('tokenMeta').value.trim();
+
+      if (pixabay) payload.pixabay_api_key = pixabay;
+      if (pexels) payload.pexels_api_key = pexels;
+      if (openai) payload.openai_api_key = openai;
+      if (gemini) payload.gemini_api_key = gemini;
+      if (googleFlow) payload.google_flow_api_key = googleFlow;
+      if (kling) payload.kling_api_key = kling;
+      if (luma) payload.luma_api_key = luma;
+      if (eleven) payload.elevenlabs_api_key = eleven;
+      if (googleTts) payload.google_tts_api_key = googleTts;
+      if (meta) payload.meta_access_token = meta;
+
+      try {
+        const res = await fetch('/api/v1/config/keys', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        const d = await res.json();
+        alert('API Anahtarları başarıyla güncellendi ve aktifleştirildi!');
+        closeApiModal();
+        checkApiStatus();
+      } catch (err) {
+        alert('Kaydetme hatası: ' + err.message);
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = '💾 Anahtarları Kaydet ve Aktifleştir';
+      }
+    }
+
+    // Initialize campaign & fetch videos
+    async function init() {
+      checkApiStatus();
+      fetchJobs();
+    }
+
+    // Render video gallery
+    let selectedJobIds = new Set();
+
+    function updateDeleteSelection() {
+      document.querySelectorAll('.video-card').forEach(card => {
+        card.classList.toggle('selected', selectedJobIds.has(card.dataset.jobId));
+      });
+      document.querySelectorAll('.select-video').forEach(input => {
+        input.checked = selectedJobIds.has(input.dataset.jobId);
+      });
+      const button = document.getElementById('deleteSelectedBtn');
+      if (button) {
+        button.disabled = selectedJobIds.size === 0;
+        button.textContent = `Seçilenleri Sil (${selectedJobIds.size})`;
+      }
+    }
+
+    function toggleJobSelection(jobId, checked) {
+      if (checked) selectedJobIds.add(jobId);
+      else selectedJobIds.delete(jobId);
+      updateDeleteSelection();
+    }
+
+    function renderJobs(jobs) {
+      const grid = document.getElementById('videoGrid');
+      if (!jobs || jobs.length === 0) {
+        grid.innerHTML = '<div class="empty-state gallery-empty"><div><strong>Henüz bir kare yok</strong><span>Sol panelden kısa bir fikir girin. Senaryo, ses ve görseller birkaç dakika içinde burada sıraya alınacak.</span></div></div>';
+        return;
+      }
+
+      grid.innerHTML = jobs.map(job => {
+        const isComplete = job.status === 'COMPLETED' && job.render_path;
+        const renderedFile = String(job.render_path || '').split(/[\\\\/]/).pop();
+        const videoSrc = isComplete
+          ? `/media/renders/${encodeURIComponent(renderedFile || `${job.job_id}.mp4`)}`
+          : '';
+        const posterFile = renderedFile ? renderedFile.replace(/\.mp4$/i, '.jpg') : '';
+        const posterSrc = posterFile ? `/media/renders/${encodeURIComponent(posterFile)}?v=${encodeURIComponent(job.updated_at || job.job_id)}` : '';
+        const createdDate = job.created_at ? new Date(job.created_at).toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' }) : '';
+
+        return `
+          <div class="video-card" data-job-id="${job.job_id}">
+            <div class="video-player-wrapper">
+              <input class="select-video" type="checkbox" data-job-id="${job.job_id}"
+                aria-label="Videoyu seç"
+                onchange="toggleJobSelection('${job.job_id}', this.checked)">
+              ${isComplete ? `
+                <video src="${videoSrc}" poster="${posterSrc}" controls playsinline preload="metadata"></video>
+              ` : `
+                <div style="height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; color: #64748b; padding: 20px; text-align: center;">
+                  <div class="pulse-dot" style="width: 12px; height: 12px; background: #38bdf8; box-shadow: 0 0 15px #38bdf8;"></div>
+                  <span style="font-size: 0.8rem; font-weight: 600;">${job.status}</span>
+                </div>
+              `}
+            </div>
+            <div class="video-details">
+              <div style="display: flex; justify-content: space-between; align-items: center; gap: 8px;">
+                <span class="badge-status badge-${job.status}">${job.status}</span>
+                ${job.brand_tone ? `<span style="font-size: 0.72rem; color: #94a3b8; text-transform: uppercase;">#${job.brand_tone}</span>` : ''}
+              </div>
+              <div class="video-topic" title="${job.input_topic || ''}">
+                ${job.input_topic || 'Viral Video'}
+              </div>
+              <div class="video-meta">
+                <span>Saat: ${createdDate}</span>
+                ${isComplete ? `
+                  <a href="${videoSrc}" download="${job.job_id}.mp4" class="btn-download" onclick="recordEvent('video_downloaded', {job_id: '${job.job_id}'})">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                      <polyline points="7 10 12 15 17 10"></polyline>
+                      <line x1="12" y1="15" x2="12" y2="3"></line>
+                    </svg>
+                    MP4 İndir
+                  </a>
+                ` : ''}
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('');
+      updateDeleteSelection();
+      requestAnimationFrame(prepareVideoPreviews);
+    }
+
+    function prepareVideoPreviews() {
+      document.querySelectorAll('#videoGrid video').forEach(video => {
+        video.muted = true;
+        video.playsInline = true;
+        video.preload = 'auto';
+
+        const revealFirstFrame = () => {
+          if (video.readyState >= 2 && video.currentTime === 0) {
+            try {
+              video.currentTime = Math.min(0.12, Math.max(0.01, (video.duration || 1) / 100));
+            } catch (_) {}
+          }
+        };
+
+        video.addEventListener('loadedmetadata', revealFirstFrame, { once: true });
+        video.addEventListener('loadeddata', () => {
+          if (video.currentTime === 0) revealFirstFrame();
+        }, { once: true });
+
+        if (video.readyState >= 1) revealFirstFrame();
+      });
+    }
+
+    async function deleteSelectedJobs() {
+      if (selectedJobIds.size === 0) return;
+      if (!confirm(`${selectedJobIds.size} seçili videoyu ve dosyalarını silmek istiyor musunuz?`)) return;
+
+      const button = document.getElementById('deleteSelectedBtn');
+      button.disabled = true;
+      try {
+        const response = await fetch('/api/v1/jobs/delete', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ job_ids: [...selectedJobIds] }),
+        });
+        if (!response.ok) throw new Error(await response.text());
+        selectedJobIds.clear();
+        await fetchJobs();
+      } catch (err) {
+        alert('Videolar silinemedi: ' + err.message);
+        button.disabled = false;
+      }
+    }
+
+    async function fetchJobs() {
+      try {
+        const res = await fetch('/api/v1/jobs');
+        if (!res.ok) {
+          const error = await res.json().catch(() => ({}));
+          throw new Error(error.detail || `Galeri yüklenemedi (${res.status})`);
+        }
+        const data = await res.json();
+        renderJobs(data.jobs || []);
+      } catch (err) {
+        console.error('Fetch error:', err);
+        const grid = document.getElementById('videoGrid');
+        if (grid) {
+          grid.innerHTML = `<div class="empty-state gallery-empty"><div><strong>Video listesi yüklenemedi</strong><span>${escapeHtml(err.message)}</span></div></div>`;
+        }
+      }
+    }
+
+    function escapeHtml(value) {
+      return String(value).replace(/[&<>"']/g, character => ({
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#039;'
+      })[character]);
+    }
+
+      async function recordEvent(eventName, properties = {}) {
+        try {
+          await fetch('/api/v1/analytics/events', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ event_name: eventName, properties })
+          });
+        } catch (err) {
+          console.error('Event tracking error:', err);
+        }
+      }
+
+      async function loadProductKpis() {
+        try {
+          const response = await fetch('/api/v1/analytics/kpis');
+          if (!response.ok) return;
+          const data = await response.json();
+          document.getElementById('kpiNps').textContent = data.customer.nps ?? '—';
+          document.getElementById('kpiCsat').textContent = data.customer.csat ?? '—';
+          document.getElementById('kpiFunnel').textContent = `${data.funnel_completion_rate_pct}%`;
+          document.getElementById('kpiCost').textContent = data.cost.cost_per_completed_video == null
+            ? '—'
+            : `$${data.cost.cost_per_completed_video}`;
+          document.getElementById('kpiViews').textContent = Number(data.social_performance.views || 0).toLocaleString('tr-TR');
+        } catch (err) {
+          console.error('KPI load error:', err);
+        }
+      }
+
+      async function submitFeedback(type, score) {
+        const response = await fetch('/api/v1/analytics/feedback', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ feedback_type: type, score })
+        });
+        if (!response.ok) {
+          alert('Geri bildirim kaydedilemedi.');
+          return;
+        }
+        alert('Geri bildiriminiz kaydedildi. Teşekkürler!');
+        loadProductKpis();
+      }
+
+    async function handleGenerate(e) {
+      e.preventDefault();
+      const btn = document.getElementById('btnSubmit');
+      const topic = document.getElementById('topic').value;
+      const tone = document.getElementById('tone').value;
+      const duration = parseInt(document.getElementById('duration').value);
+      const subtitlesEnabled = document.getElementById('subtitles').value === 'true';
+
+      btn.disabled = true;
+      btn.innerHTML = 'Boru Hattı Başlatılıyor...';
+
+      const pipelineCard = document.getElementById('pipelineStatus');
+      pipelineCard.style.display = 'block';
+      updatePipelineStep('GENERATING_SCRIPT');
+      recordEvent('generation_started', {topic: topic.substring(0, 120), duration: duration});
+
+      const langSelect = document.getElementById('language');
+      const language = langSelect ? langSelect.value : 'tr';
+
+      try {
+        const campRes = await fetch('/api/v1/default-campaign');
+        if (!campRes.ok) {
+          const error = await campRes.json().catch(() => ({}));
+          throw new Error(error.detail || 'Varsayılan kampanya hazırlanamadı.');
+        }
+        const campData = await campRes.json();
+        const campaignId = campData.campaign_id;
+
+        const payload = {
+          campaign_id: campaignId,
+          input_topic: topic,
+          brand_tone: tone,
+          target_language: language,
+          target_duration_secs: duration,
+          subtitles_enabled: subtitlesEnabled,
+          auto_publish: false
+        };
+
+        const res = await fetch('/api/v1/generate', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+
+        if (!res.ok) {
+          const error = await res.json().catch(() => ({}));
+          throw new Error(error.detail || `Video oluşturma isteği reddedildi (${res.status})`);
+        }
+        const job = await res.json();
+        if (!job.job_id) throw new Error('Sunucu geçerli bir iş kimliği döndürmedi.');
+        trackJob(job.job_id);
+
+      } catch (err) {
+        const message = err.message === 'Invalid API key.'
+          ? 'Oturum anahtarınız güncellendi. Lütfen tekrar giriş yapın.'
+          : 'İşlem başlatılırken hata oluştu: ' + err.message;
+        alert(message);
+        btn.disabled = false;
+        btn.innerHTML = 'Otonom Video Üretimini Başlat';
+        const pipelineError = document.getElementById('pipelineError');
+        if (pipelineError) {
+          pipelineError.textContent = message;
+          pipelineError.hidden = false;
+        }
+      }
+    }
+
+    function trackJob(jobId) {
+      if (pollInterval) clearInterval(pollInterval);
+      const errorBox = document.getElementById('pipelineError');
+      errorBox.hidden = true;
+      errorBox.textContent = '';
+
+      pollInterval = setInterval(async () => {
+        try {
+          const res = await fetch(`/api/v1/status/${jobId}`);
+          const data = await res.json();
+          updatePipelineStep(data.status);
+
+          if (data.status === 'COMPLETED' || data.status === 'FAILED') {
+            clearInterval(pollInterval);
+            if (data.status === 'FAILED') {
+              errorBox.textContent = data.error_message || 'Video üretimi başarısız oldu.';
+              if (data.error_message && data.error_message.includes('Google Gemini video kotası')) {
+                const link = document.createElement('a');
+                link.href = 'https://aistudio.google.com/rate-limit?timeRange=last-28-days';
+                link.target = '_blank';
+                link.rel = 'noopener noreferrer';
+                link.textContent = ' Google AI Studio kota sayfasını aç.';
+                errorBox.appendChild(link);
+              }
+              errorBox.hidden = false;
+            } else if (data.status === 'COMPLETED') {
+              recordEvent('job_completed', {job_id: jobId});
+            }
+            document.getElementById('btnSubmit').disabled = false;
+            document.getElementById('btnSubmit').innerHTML = 'Otonom Video Üretimini Başlat';
+            fetchJobs();
+          }
+        } catch (err) {
+          console.error('Polling error:', err);
+        }
+      }, 1500);
+    }
+
+    function updatePipelineStep(status) {
+      const badge = document.getElementById('currentStatusBadge');
+      badge.textContent = status;
+      badge.className = `badge-status badge-${status}`;
+
+      const steps = {
+        'GENERATING_SCRIPT': ['step-script'],
+        'SYNTHESIZING_AUDIO': ['step-script', 'step-voice'],
+        'FETCHING_BROLL': ['step-script', 'step-voice', 'step-broll'],
+        'EDITING_VIDEO': ['step-script', 'step-voice', 'step-broll', 'step-render'],
+        'COMPLETED': ['step-script', 'step-voice', 'step-broll', 'step-render']
+      };
+
+      const activeList = steps[status] || [];
+
+      ['step-script', 'step-voice', 'step-broll', 'step-render'].forEach(id => {
+        const el = document.getElementById(id);
+        el.classList.remove('active', 'done');
+
+        if (status === 'COMPLETED') {
+          el.classList.add('done');
+        } else if (activeList.includes(id)) {
+          if (activeList[activeList.length - 1] === id) {
+            el.classList.add('active');
+          } else {
+            el.classList.add('done');
+          }
+        }
+      });
+    }
+
+    function initProductAnalytics() {
+      recordEvent('studio_opened');
+      loadProductKpis();
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      if (applySession()) {
+        init();
+        initProductAnalytics();
+      }
+    });
+  </script>
+
+</body>
+</html>

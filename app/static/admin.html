@@ -1,0 +1,63 @@
+<!doctype>
+<html lang="tr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ViralBrandEngine - Yönetici Girişi</title>
+  <style>
+    * { box-sizing: border-box; }
+    html { color-scheme: dark; }
+    body { margin: 0; min-height: 100vh; display: grid; place-items: center; font-family: "Plus Jakarta Sans", Arial, sans-serif; color: #f7f7f5; background: radial-gradient(circle at 25% 20%, rgba(186,255,41,.055), transparent 22%), #08090a; }
+    body::before { content:""; position:fixed; top:0; left:0; right:0; height:1px; background:#baff29; opacity:.55; }
+    form { width: min(410px, calc(100% - 32px)); padding: 38px; border: 1px solid rgba(255,255,255,.105); border-radius: 18px; background: #111214; box-shadow: 0 40px 100px rgba(0,0,0,.65); }
+    h1 { margin: 0 0 8px; font-size: 28px; letter-spacing: -.04em; text-wrap: balance; }
+    p { margin: 0 0 26px; color: #96989d; line-height: 1.55; }
+    label { display: block; margin-bottom: 7px; color: #c9cacf; font-size: 13px; font-weight: 600; }
+    input { width: 100%; margin-bottom: 18px; padding: 13px; border: 1px solid rgba(255,255,255,.105); border-radius: 9px; color: #f7f7f5; background: #0c0d0e; }
+    input:focus-visible { outline: 3px solid rgba(186,255,41,.3); outline-offset: 2px; }
+    button { width: 100%; min-height: 46px; border: 0; border-radius: 999px; color: #080908; background: #baff29; font-weight: 800; cursor: pointer; }
+    button:hover { background: #cdff6b; }
+    #error { min-height: 20px; margin-top: 14px; color: #ff8e87; }
+  </style>
+</head>
+<body>
+  <form id="adminLogin">
+    <h1>Yönetici Girişi</h1>
+    <p>Bu alan yalnızca yetkili yönetici hesaplarına açıktır.</p>
+    <label for="username">Kullanıcı adı</label>
+    <input id="username" autocomplete="username" required>
+    <label for="password">Şifre</label>
+    <input id="password" type="password" autocomplete="current-password" required>
+    <button type="submit">Yönetici Paneline Giriş Yap</button>
+    <div id="error"></div>
+  </form>
+  <script>
+    document.getElementById('adminLogin').addEventListener('submit', async (event) => {
+      event.preventDefault();
+      const error = document.getElementById('error');
+      error.textContent = '';
+      try {
+        const response = await fetch('/api/v1/auth/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            username: document.getElementById('username').value.trim(),
+            password: document.getElementById('password').value
+          })
+        });
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.detail || 'Giriş başarısız.');
+        localStorage.setItem('VBE_ADMIN_API_KEY', data.api_key);
+        localStorage.setItem('VBE_SESSION', JSON.stringify({
+          username: data.username,
+          role: data.role,
+          display_name: data.display_name
+        }));
+        location.href = '/';
+      } catch (err) {
+        error.textContent = err.message;
+      }
+    });
+  </script>
+</body>
+</html>

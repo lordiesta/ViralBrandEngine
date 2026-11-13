@@ -1,0 +1,11 @@
+$kind: http-request
+description: Sadece tamamlanmış videoların başlıklarını ve doğrudan MP4 izleme/oynatma linklerini getirir.
+url: http://127.0.0.1:8000/api/v1/videos?limit=10
+method: GET
+headers:
+  Accept: application/json
+queryParams:
+  - key: limit
+    value: "10"
+    description: Getirilecek maksimum video sayısı
+order: 1000

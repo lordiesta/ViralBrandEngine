@@ -1,0 +1,19 @@
+$kind: http-request
+description: Konu, dil veya duruma göre özel filtreleme yaparak videoları ve izleme linklerini çeker.
+url: http://127.0.0.1:8000/api/v1/analytics/query
+method: POST
+headers:
+  Content-Type: application/json
+  Accept: application/json
+body:
+  type: text
+  content: |-
+    {
+      "language": "tr",
+      "status": "COMPLETED",
+      "topic_contains": "kedi",
+      "limit": 5,
+      "sort_by": "created_at",
+      "sort_order": "desc"
+    }
+order: 3000

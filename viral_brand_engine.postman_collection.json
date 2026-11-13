@@ -1,0 +1,132 @@
+{
+  "info": {
+    "name": "ViralBrandEngine API Collection",
+    "description": "Autonomous AI Video Studio - Teacher Integration & Data Collection API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "1. Videolar ve İzleme Linkleri (Basit Liste)",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "http://127.0.0.1:8000/api/v1/videos?limit=10",
+          "protocol": "http",
+          "host": ["127", "0", "0", "1"],
+          "port": "8000",
+          "path": ["api", "v1", "videos"],
+          "query": [
+            {
+              "key": "limit",
+              "value": "10",
+              "description": "Getirilecek maksimum video sayısı"
+            }
+          ]
+        },
+        "description": "Sadece tamamlanmış videoların başlıklarını ve doğrudan MP4 izleme/oynatma linklerini getirir."
+      }
+    },
+    {
+      "name": "2. Platform Özet İstatistikleri (Analytics Summary)",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "http://127.0.0.1:8000/api/v1/analytics/summary",
+          "protocol": "http",
+          "host": ["127", "0", "0", "1"],
+          "port": "8000",
+          "path": ["api", "v1", "analytics", "summary"]
+        },
+        "description": "Toplam video sayısı, başarı oranı, süre, dil ve sağlayıcı dağılımlarını döner."
+      }
+    },
+    {
+      "name": "3. Filtreli Video Arama (POST Query)",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Accept",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"language\": \"tr\",\n  \"status\": \"COMPLETED\",\n  \"topic_contains\": \"kedi\",\n  \"limit\": 5,\n  \"sort_by\": \"created_at\",\n  \"sort_order\": \"desc\"\n}"
+        },
+        "url": {
+          "raw": "http://127.0.0.1:8000/api/v1/analytics/query",
+          "protocol": "http",
+          "host": ["127", "0", "0", "1"],
+          "port": "8000",
+          "path": ["api", "v1", "analytics", "query"]
+        },
+        "description": "Konu, dil veya duruma göre özel filtreleme yaparak videoları ve izleme linklerini çeker."
+      }
+    },
+    {
+      "name": "4. Yeni Video Üretimi Başlat (POST Generate)",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Accept",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"campaign_id\": \"b81a8b0d-327c-473d-82d8-5b326cb6002f\",\n  \"input_topic\": \"Derin Öğrenme ve Yapay Sinir Ağları\",\n  \"brand_tone\": \"educational\",\n  \"target_language\": \"tr\",\n  \"target_duration_secs\": 10,\n  \"auto_publish\": false\n}"
+        },
+        "url": {
+          "raw": "http://127.0.0.1:8000/api/v1/generate",
+          "protocol": "http",
+          "host": ["127", "0", "0", "1"],
+          "port": "8000",
+          "path": ["api", "v1", "generate"]
+        },
+        "description": "Dış sistemden asenkron yeni bir video üretim işi tetikler."
+      }
+    },
+    {
+      "name": "5. Tam Veri Seti İhracı (Export Dataset)",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "http://127.0.0.1:8000/api/v1/analytics/export",
+          "protocol": "http",
+          "host": ["127", "0", "0", "1"],
+          "port": "8000",
+          "path": ["api", "v1", "analytics", "export"]
+        },
+        "description": "Veri analitiği ve raporlama için tüm veritabanı dökümünü tek bir JSON olarak döner."
+      }
+    }
+  ]
+}

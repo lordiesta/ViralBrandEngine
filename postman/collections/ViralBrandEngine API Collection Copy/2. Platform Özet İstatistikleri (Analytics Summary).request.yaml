@@ -1,0 +1,7 @@
+$kind: http-request
+description: Toplam video sayısı, başarı oranı, süre, dil ve sağlayıcı dağılımlarını döner.
+url: http://127.0.0.1:8000/api/v1/analytics/summary
+method: GET
+headers:
+  Accept: application/json
+order: 2000

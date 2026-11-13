@@ -1,0 +1,57 @@
+# ViralBrandEngine
+__pycache__/
+*.py[cod]
+*.egg-info/
+dist/
+build/
+.eggs/
+
+# Environment
+.env
+.venv/
+venv/
+env/
+
+# Media artifacts (generated at runtime)
+media/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Docker
+docker-compose.override.yml
+
+# Temporary files
+*TEMP_MPY_wvf_snd.mp4
+test_frame.png
+check_db.py
+gen_report2.py
+generate_architecture_pdf.py
+architecture_report*.html
+
+# Generated PDFs (large binary)
+*.pdf
+
+# Database
+*.db
+*.sqlite
+
+# Postman workspace files (copies)
+.postman/
+
+
+# Large generated media files
+*.mp4
+*.jpg
+*.png
+*.txt
+!requirements.txt
+!HANDOFF.md
+!README.md

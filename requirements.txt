@@ -1,0 +1,40 @@
+# ViralBrandEngine - Dependencies
+# ================================
+
+# Web Framework
+fastapi==0.115.0
+uvicorn[standard]==0.30.6
+python-multipart==0.0.9
+
+# Async Task Queue
+celery[redis]==5.4.0
+redis==5.1.0
+
+# Database
+sqlalchemy==2.0.35
+psycopg2-binary==2.9.9
+alembic==1.13.2
+
+# Settings & Validation
+pydantic==2.9.2
+pydantic-settings==2.5.2
+
+# External API Clients
+openai==1.50.0
+requests==2.32.3
+httpx==0.27.2
+elevenlabs==1.9.0
+gTTS>=2.5.0
+pyttsx3>=2.99
+
+# Video Processing
+moviepy==1.0.3
+Pillow==10.4.0
+openpyxl==3.1.5
+reportlab==4.4.4
+
+# Utilities
+python-dotenv==1.0.1
+structlog==24.4.0
+tenacity==9.0.0
+aiofiles==24.1.0

@@ -1,0 +1,19 @@
+$kind: http-request
+description: Dış sistemden asenkron yeni bir video üretim işi tetikler.
+url: http://127.0.0.1:8000/api/v1/generate
+method: POST
+headers:
+  Content-Type: application/json
+  Accept: application/json
+body:
+  type: text
+  content: |-
+    {
+      "campaign_id": "b81a8b0d-327c-473d-82d8-5b326cb6002f",
+      "input_topic": "Derin Öğrenme ve Yapay Sinir Ağları",
+      "brand_tone": "educational",
+      "target_language": "tr",
+      "target_duration_secs": 10,
+      "auto_publish": false
+    }
+order: 4000

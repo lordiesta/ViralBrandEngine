@@ -1,0 +1,7 @@
+$kind: http-request
+description: Veri analitiği ve raporlama için tüm veritabanı dökümünü tek bir JSON olarak döner.
+url: http://127.0.0.1:8000/api/v1/analytics/export
+method: GET
+headers:
+  Accept: application/json
+order: 5000
